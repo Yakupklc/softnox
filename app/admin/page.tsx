@@ -7,7 +7,7 @@ export default async function AdminPage() {
   const { data: { user } } = await supabase.auth.getUser();
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name, title")
+    .select("full_name, title, role")
     .eq("id", user!.id)
     .single();
 
@@ -18,7 +18,7 @@ export default async function AdminPage() {
 
   return (
     <AdminCRM
-      profile={profile ?? { full_name: "Admin", title: "Yönetici" }}
+      profile={profile ?? { full_name: "Admin", title: "Yönetici", role: "admin" }}
       initialContacts={contacts ?? []}
     />
   );

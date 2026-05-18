@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 /* ===== Types ===== */
-interface Profile { full_name: string; title: string; }
+interface Profile { full_name: string; title: string; role?: string; }
 interface Contact {
   id: string;
   sirket_adi: string;
@@ -214,6 +214,7 @@ function ContactModal({
 /* ===== Main CRM component ===== */
 export default function AdminCRM({ profile, initialContacts }: { profile: Profile; initialContacts: Contact[] }) {
   const router = useRouter();
+  const isSuperAdmin = profile.role === "super_admin";
   const supabase = createClient();
   const [contacts, setContacts] = useState<Contact[]>(initialContacts);
   const [search, setSearch] = useState("");
@@ -298,6 +299,14 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
               <span className="admin-topbar__role">{profile.title}</span>
             </div>
           </div>
+          {isSuperAdmin && (
+            <button
+              onClick={() => router.push("/admin/settings")}
+              style={{ background: "none", border: "1px solid var(--border)", color: "var(--text-mute)", borderRadius: 6, padding: "4px 12px", fontSize: 12, cursor: "pointer" }}
+            >
+              ⚙ Ayarlar
+            </button>
+          )}
           <button className="admin-topbar__logout" onClick={handleLogout}>
             <LogoutIcon /> Çıkış
           </button>
