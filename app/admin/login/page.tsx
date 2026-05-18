@@ -26,6 +26,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [view, setView] = useState<"login" | "forgot">("login");
+  const [resetSent, setResetSent] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,6 +43,22 @@ export default function LoginPage() {
     router.push("/admin/welcome");
   };
 
+  const handleForgot = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    const supabase = createClient();
+    const { error: err } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: "https://softnox.com.tr/auth/reset-password",
+    });
+    setLoading(false);
+    if (err) {
+      setError("Mail gönderilemedi: " + err.message);
+      return;
+    }
+    setResetSent(true);
+  };
+
   return (
     <div className="admin-login">
       <div className="admin-login__grid-bg" />
@@ -50,43 +68,91 @@ export default function LoginPage() {
       <div className="admin-login__card">
         <div className="admin-login__logo"><Logo /></div>
         <h1 className="admin-login__title">Yönetim Paneli</h1>
-        <p className="admin-login__sub">Devam etmek için giriş yapın.</p>
+        <p className="admin-login__sub">
+          {view === "login" ? "Devam etmek için giriş yapın." : "Şifre sıfırlama bağlantısı gönderilecek."}
+        </p>
 
-        <form className="admin-login__form" onSubmit={handleSubmit} noValidate>
-          {error && <div className="admin-login__err">{error}</div>}
+        {view === "login" ? (
+          <form className="admin-login__form" onSubmit={handleSubmit} noValidate>
+            {error && <div className="admin-login__err">{error}</div>}
 
-          <label className="field">
-            <span className="field__lbl">E-posta</span>
-            <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              placeholder="admin@softnox.com.tr"
-              required
-              autoComplete="email"
-            />
-          </label>
+            <label className="field">
+              <span className="field__lbl">E-posta</span>
+              <input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="admin@softnox.com.tr"
+                required
+                autoComplete="email"
+              />
+            </label>
 
-          <label className="field">
-            <span className="field__lbl">Şifre</span>
-            <input
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-              autoComplete="current-password"
-            />
-          </label>
+            <label className="field">
+              <span className="field__lbl">Şifre</span>
+              <input
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                autoComplete="current-password"
+              />
+            </label>
 
-          <button
-            type="submit"
-            className="btn btn--primary admin-login__btn"
-            disabled={loading}
-          >
-            {loading ? "Giriş yapılıyor..." : "Giriş Yap"}
-          </button>
-        </form>
+            <button type="submit" className="btn btn--primary admin-login__btn" disabled={loading}>
+              {loading ? "Giriş yapılıyor..." : "Giriş Yap"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => { setView("forgot"); setError(""); }}
+              style={{ background: "none", border: "none", color: "#64748b", fontSize: "0.8rem", cursor: "pointer", marginTop: "0.5rem", textDecoration: "underline" }}
+            >
+              Şifremi unuttum
+            </button>
+          </form>
+        ) : resetSent ? (
+          <div style={{ color: "#22d3ee", textAlign: "center", padding: "1rem" }}>
+            ✓ Şifre sıfırlama maili gönderildi. Gelen kutunuzu kontrol edin.
+            <br />
+            <button
+              type="button"
+              onClick={() => { setView("login"); setResetSent(false); }}
+              style={{ background: "none", border: "none", color: "#64748b", fontSize: "0.8rem", cursor: "pointer", marginTop: "1rem", textDecoration: "underline" }}
+            >
+              Giriş sayfasına dön
+            </button>
+          </div>
+        ) : (
+          <form className="admin-login__form" onSubmit={handleForgot} noValidate>
+            {error && <div className="admin-login__err">{error}</div>}
+
+            <label className="field">
+              <span className="field__lbl">E-posta</span>
+              <input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="admin@softnox.com.tr"
+                required
+                autoComplete="email"
+              />
+            </label>
+
+            <button type="submit" className="btn btn--primary admin-login__btn" disabled={loading}>
+              {loading ? "Gönderiliyor..." : "Sıfırlama Maili Gönder"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => { setView("login"); setError(""); }}
+              style={{ background: "none", border: "none", color: "#64748b", fontSize: "0.8rem", cursor: "pointer", marginTop: "0.5rem", textDecoration: "underline" }}
+            >
+              Geri dön
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );
