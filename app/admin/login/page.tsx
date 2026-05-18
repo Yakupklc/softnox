@@ -34,11 +34,23 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
     const supabase = createClient();
-    const { error: err } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error: err } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (err) {
       setError("E-posta veya şifre hatalı. Lütfen tekrar deneyin.");
       return;
+    }
+    // İlk girişte şifre değiştirme kontrolü
+    if (data.user) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("must_change_password")
+        .eq("id", data.user.id)
+        .single();
+      if (profile?.must_change_password) {
+        router.push("/admin/change-password");
+        return;
+      }
     }
     router.push("/admin/welcome");
   };

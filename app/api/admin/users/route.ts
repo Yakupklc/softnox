@@ -48,15 +48,15 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   if (!(await isSuperAdmin())) return NextResponse.json({ error: "Yetkisiz" }, { status: 403 });
 
-  const { email, password, full_name, role } = await req.json();
-  if (!email || !password || !full_name) {
+  const { email, full_name, role } = await req.json();
+  if (!email || !full_name) {
     return NextResponse.json({ error: "Tüm alanlar zorunlu" }, { status: 400 });
   }
 
   const admin = adminClient();
   const { data, error } = await admin.auth.admin.createUser({
     email,
-    password,
+    password: "softnox",   // varsayılan ilk şifre
     email_confirm: true,
   });
 
@@ -68,6 +68,7 @@ export async function POST(req: NextRequest) {
     id: data.user.id,
     full_name,
     role: role ?? "admin",
+    must_change_password: true,
   });
 
   return NextResponse.json({ success: true, user: data.user });

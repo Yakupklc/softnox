@@ -35,7 +35,7 @@ export default function AdminSettings({ profile }: { profile: Profile }) {
 
   // Yeni kullanıcı formu
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ email: "", password: "", full_name: "", role: "admin" });
+  const [form, setForm] = useState({ email: "", full_name: "", role: "admin" });
   const [saving, setSaving] = useState(false);
 
   const flash = (type: "ok" | "err", text: string) => {
@@ -60,16 +60,26 @@ export default function AdminSettings({ profile }: { profile: Profile }) {
     const res = await fetch("/api/admin/users", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ ...form }),
     });
     const data = await res.json();
     setSaving(false);
     if (!res.ok) { flash("err", data.error); return; }
     flash("ok", `${form.full_name} başarıyla eklendi.`);
     setShowForm(false);
-    setForm({ email: "", password: "", full_name: "", title: "", role: "admin" });
+    setForm({ email: "", full_name: "", role: "admin" });
     // listeyi yenile
     fetch("/api/admin/users").then(r => r.json()).then(d => setUsers(d.users ?? []));
+  };
+
+  const handleSendInitialLink = async (user: User) => {
+    if (!confirm(`${user.email} adresine ilk giriş şifre belirleme linki gönderilsin mi?`)) return;
+    // must_change_password = true yap (tekrar ilk giriş akışına sok)
+    await fetch(`/api/admin/users/${user.id}/force-change`, { method: "POST" });
+    const res = await fetch(`/api/admin/users/${user.id}/reset-password`, { method: "POST" });
+    const data = await res.json();
+    if (!res.ok) flash("err", data.error);
+    else flash("ok", `${user.email} adresine ilk giriş linki gönderildi.`);
   };
 
   const handleResetPassword = async (user: User) => {
@@ -156,16 +166,15 @@ export default function AdminSettings({ profile }: { profile: Profile }) {
                   <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} required placeholder="kullanici@softnox.com.tr" />
                 </label>
                 <label className="field">
-                  <span className="field__lbl">Şifre</span>
-                  <input type="password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} required placeholder="En az 6 karakter" />
-                </label>
-                <label className="field">
                   <span className="field__lbl">Rol</span>
                   <select value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value }))}>
                     <option value="admin">Admin</option>
                     <option value="super_admin">Süper Admin</option>
                   </select>
                 </label>
+              </div>
+              <div style={{ padding: "8px 12px", background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.2)", borderRadius: 6, fontSize: 12, color: "#fbbf24", marginBottom: 8 }}>
+                ⚠ Kullanıcı varsayılan şifre <strong>softnox</strong> ile oluşturulur. İlk girişte yeni şifre belirleme ekranı açılır.
               </div>
               <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
                 <button type="button" className="btn btn--ghost btn--sm" onClick={() => setShowForm(false)}>İptal</button>
@@ -207,16 +216,28 @@ export default function AdminSettings({ profile }: { profile: Profile }) {
                     </td>
                     <td className="mono dim">{new Date(u.created_at).toLocaleDateString("tr-TR")}</td>
                     <td>
-                      <button
-                        onClick={() => handleResetPassword(u)}
-                        style={{
-                          background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.3)",
-                          color: "#60a5fa", borderRadius: 6, padding: "4px 10px", fontSize: 11,
-                          cursor: "pointer", whiteSpace: "nowrap",
-                        }}
-                      >
-                        🔑 Şifre Sıfırla
-                      </button>
+                      <div style={{ display: "flex", gap: 6 }}>
+                        <button
+                          onClick={() => handleResetPassword(u)}
+                          style={{
+                            background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.3)",
+                            color: "#60a5fa", borderRadius: 6, padding: "4px 10px", fontSize: 11,
+                            cursor: "pointer", whiteSpace: "nowrap",
+                          }}
+                        >
+                          🔑 Şifre Sıfırla
+                        </button>
+                        <button
+                          onClick={() => handleSendInitialLink(u)}
+                          style={{
+                            background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.2)",
+                            color: "#fbbf24", borderRadius: 6, padding: "4px 10px", fontSize: 11,
+                            cursor: "pointer", whiteSpace: "nowrap",
+                          }}
+                        >
+                          ✉ İlk Giriş Linki
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
