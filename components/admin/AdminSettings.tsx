@@ -98,13 +98,11 @@ export default function AdminSettings({ profile }: { profile: Profile }) {
   };
 
   const handleSendInitialLink = async (user: User) => {
-    if (!confirm(`${user.email} adresine ilk giriş şifre belirleme linki gönderilsin mi?`)) return;
-    // must_change_password = true yap (tekrar ilk giriş akışına sok)
-    await fetch(`/api/admin/users/${user.id}/force-change`, { method: "POST" });
-    const res = await fetch(`/api/admin/users/${user.id}/reset-password`, { method: "POST" });
+    if (!confirm(`${user.email} kullanıcısı bir sonraki girişinde şifre belirleme ekranı görsün mü?`)) return;
+    const res = await fetch(`/api/admin/users/${user.id}/force-change`, { method: "POST" });
     const data = await res.json();
-    if (!res.ok) flash("err", data.error);
-    else flash("ok", `${user.email} adresine ilk giriş linki gönderildi.`);
+    if (!res.ok) flash("err", data.error ?? "Hata oluştu.");
+    else flash("ok", `${user.email} kullanıcısı bir sonraki girişinde şifresini belirleyecek.`);
   };
 
   const handleResetPassword = async (user: User) => {
