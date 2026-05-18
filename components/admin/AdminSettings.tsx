@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 interface Profile { full_name: string; role: string; }
 interface User {
   id: string; email: string; full_name: string;
-  title: string; role: string; created_at: string;
+  role: string; created_at: string;
 }
 
 const Logo = () => (
@@ -37,6 +37,11 @@ export default function AdminSettings({ profile }: { profile: Profile }) {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ email: "", full_name: "", role: "admin" });
   const [saving, setSaving] = useState(false);
+
+  // Düzenleme modalı
+  const [editUser, setEditUser] = useState<User | null>(null);
+  const [editForm, setEditForm] = useState({ full_name: "", role: "admin" });
+  const [editSaving, setEditSaving] = useState(false);
 
   const flash = (type: "ok" | "err", text: string) => {
     setMsg({ type, text });
@@ -70,6 +75,26 @@ export default function AdminSettings({ profile }: { profile: Profile }) {
     setForm({ email: "", full_name: "", role: "admin" });
     // listeyi yenile
     fetch("/api/admin/users").then(r => r.json()).then(d => setUsers(d.users ?? []));
+  };
+
+  const openEdit = (u: User) => { setEditUser(u); setEditForm({ full_name: u.full_name, role: u.role }); };
+  const closeEdit = () => setEditUser(null);
+
+  const handleEditSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editUser) return;
+    setEditSaving(true);
+    const res = await fetch(`/api/admin/users/${editUser.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(editForm),
+    });
+    const data = await res.json();
+    setEditSaving(false);
+    if (!res.ok) { flash("err", data.error); return; }
+    setUsers(prev => prev.map(u => u.id === editUser.id ? { ...u, ...editForm } : u));
+    flash("ok", "Kullanıcı güncellendi.");
+    closeEdit();
   };
 
   const handleSendInitialLink = async (user: User) => {
@@ -228,6 +253,16 @@ export default function AdminSettings({ profile }: { profile: Profile }) {
                           🔑 Şifre Sıfırla
                         </button>
                         <button
+                          onClick={() => openEdit(u)}
+                          style={{
+                            background: "rgba(100,116,139,0.1)", border: "1px solid rgba(100,116,139,0.3)",
+                            color: "#94a3b8", borderRadius: 6, padding: "4px 10px", fontSize: 11,
+                            cursor: "pointer", whiteSpace: "nowrap",
+                          }}
+                        >
+                          ✏ Düzenle
+                        </button>
+                        <button
                           onClick={() => handleSendInitialLink(u)}
                           style={{
                             background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.2)",
@@ -246,6 +281,48 @@ export default function AdminSettings({ profile }: { profile: Profile }) {
           </div>
         </div>
       </main>
+
+      {/* Düzenleme Modalı */}
+      {editUser && (
+        <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) closeEdit(); }}>
+          <div className="modal" style={{ maxWidth: 420 }}>
+            <div className="modal__head">
+              <h2 className="modal__title">Kullanıcıyı Düzenle</h2>
+              <button className="modal__close" onClick={closeEdit}>✕</button>
+            </div>
+            <form onSubmit={handleEditSave}>
+              <div className="modal__body">
+                <div style={{ marginBottom: 12, fontSize: 12, color: "var(--text-mute)", fontFamily: "var(--font-mono)" }}>
+                  {editUser.email}
+                </div>
+                <label className="field">
+                  <span className="field__lbl">Ad Soyad</span>
+                  <input
+                    value={editForm.full_name}
+                    onChange={e => setEditForm(f => ({ ...f, full_name: e.target.value }))}
+                    required
+                    placeholder="Ad Soyad"
+                    autoFocus
+                  />
+                </label>
+                <label className="field" style={{ marginTop: 12 }}>
+                  <span className="field__lbl">Rol</span>
+                  <select value={editForm.role} onChange={e => setEditForm(f => ({ ...f, role: e.target.value }))}>
+                    <option value="admin">Admin</option>
+                    <option value="super_admin">Süper Admin</option>
+                  </select>
+                </label>
+              </div>
+              <div className="modal__foot">
+                <button type="button" className="btn btn--ghost btn--sm" onClick={closeEdit}>İptal</button>
+                <button type="submit" className="btn btn--primary btn--sm" disabled={editSaving}>
+                  {editSaving ? "Kaydediliyor..." : "Kaydet"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
