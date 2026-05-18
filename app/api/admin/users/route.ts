@@ -28,7 +28,7 @@ export async function GET() {
 
   // profil bilgileriyle birleştir
   const supabase = await createClient();
-  const { data: profiles } = await supabase.from("profiles").select("id, full_name, title, role");
+  const { data: profiles } = await supabase.from("profiles").select("id, full_name, role");
 
   const users = data.users.map(u => {
     const p = profiles?.find(p => p.id === u.id);
@@ -36,7 +36,6 @@ export async function GET() {
       id: u.id,
       email: u.email,
       full_name: p?.full_name ?? "",
-      title: p?.title ?? "",
       role: p?.role ?? "admin",
       created_at: u.created_at,
     };
@@ -49,8 +48,8 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   if (!(await isSuperAdmin())) return NextResponse.json({ error: "Yetkisiz" }, { status: 403 });
 
-  const { email, password, full_name, title, role } = await req.json();
-  if (!email || !password || !full_name || !title) {
+  const { email, password, full_name, role } = await req.json();
+  if (!email || !password || !full_name) {
     return NextResponse.json({ error: "Tüm alanlar zorunlu" }, { status: 400 });
   }
 
@@ -68,7 +67,6 @@ export async function POST(req: NextRequest) {
   await supabase.from("profiles").upsert({
     id: data.user.id,
     full_name,
-    title,
     role: role ?? "admin",
   });
 

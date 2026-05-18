@@ -7,15 +7,15 @@ import { createClient } from "@/lib/supabase/client";
 export default function WelcomePage() {
   const router = useRouter();
   const supabase = createClient();
-  const [profile, setProfile] = useState<{ full_name: string; title: string } | null>(null);
+  const [profile, setProfile] = useState<{ full_name: string; role: string } | null>(null);
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.replace("/admin/login"); return; }
-      const { data } = await supabase.from("profiles").select("full_name, title").eq("id", user.id).single();
-      setProfile(data ?? { full_name: user.email?.split("@")[0] ?? "Admin", title: "Yönetici" });
+      const { data } = await supabase.from("profiles").select("full_name, role").eq("id", user.id).single();
+      setProfile(data ?? { full_name: user.email?.split("@")[0] ?? "Admin", role: "admin" });
     };
     load();
   }, []);
@@ -46,7 +46,7 @@ export default function WelcomePage() {
       <div className="welcome__content">
         <div className="welcome__greeting">Hoş geldiniz</div>
         <div className="welcome__name">{profile.full_name}</div>
-        <div className="welcome__title">{profile.title}</div>
+        <div className="welcome__title">{profile.role === "super_admin" ? "Süper Admin" : "Admin"}</div>
 
         <div className="welcome__hint">
           <svg className="welcome__hint-icon" width={36} height={36} viewBox="0 0 36 36" fill="none">

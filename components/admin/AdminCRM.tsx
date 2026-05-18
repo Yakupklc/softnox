@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 /* ===== Types ===== */
-interface Profile { full_name: string; title: string; role?: string; }
+interface Profile { full_name: string; role?: string; }
 interface Contact {
   id: string;
   sirket_adi: string;
@@ -296,7 +296,7 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
             <div className="admin-topbar__avatar">{initials}</div>
             <div className="admin-topbar__info">
               <span className="admin-topbar__name">{profile.full_name}</span>
-              <span className="admin-topbar__role">{profile.title}</span>
+              <span className="admin-topbar__role">{profile.role === "super_admin" ? "Süper Admin" : "Admin"}</span>
             </div>
           </div>
           {isSuperAdmin && (

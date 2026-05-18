@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-interface Profile { full_name: string; title: string; role: string; }
+interface Profile { full_name: string; role: string; }
 interface User {
   id: string; email: string; full_name: string;
   title: string; role: string; created_at: string;
@@ -35,7 +35,7 @@ export default function AdminSettings({ profile }: { profile: Profile }) {
 
   // Yeni kullanıcı formu
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ email: "", password: "", full_name: "", title: "", role: "admin" });
+  const [form, setForm] = useState({ email: "", password: "", full_name: "", role: "admin" });
   const [saving, setSaving] = useState(false);
 
   const flash = (type: "ok" | "err", text: string) => {
@@ -103,7 +103,7 @@ export default function AdminSettings({ profile }: { profile: Profile }) {
             <div className="admin-topbar__avatar">{initials}</div>
             <div className="admin-topbar__info">
               <span className="admin-topbar__name">{profile.full_name}</span>
-              <span className="admin-topbar__role">{profile.title}</span>
+              <span className="admin-topbar__role">{profile.role === "super_admin" ? "Süper Admin" : "Admin"}</span>
             </div>
           </div>
           <button className="admin-topbar__logout" onClick={handleLogout}>
@@ -152,10 +152,6 @@ export default function AdminSettings({ profile }: { profile: Profile }) {
                   <input value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} required placeholder="Ad Soyad" />
                 </label>
                 <label className="field">
-                  <span className="field__lbl">Ünvan</span>
-                  <input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required placeholder="Satış Uzmanı" />
-                </label>
-                <label className="field">
                   <span className="field__lbl">E-posta</span>
                   <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} required placeholder="kullanici@softnox.com.tr" />
                 </label>
@@ -189,10 +185,10 @@ export default function AdminSettings({ profile }: { profile: Profile }) {
                 <tr>
                   <th>Ad Soyad</th>
                   <th>E-posta</th>
-                  <th>Ünvan</th>
                   <th>Rol</th>
                   <th>Kayıt Tarihi</th>
                   <th>İşlemler</th>
+
                 </tr>
               </thead>
               <tbody>
@@ -204,7 +200,6 @@ export default function AdminSettings({ profile }: { profile: Profile }) {
                   <tr key={u.id}>
                     <td><strong>{u.full_name || "—"}</strong></td>
                     <td className="mono dim">{u.email}</td>
-                    <td className="dim">{u.title || "—"}</td>
                     <td>
                       <span style={{ ...roleBadge(u.role), padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 600 }}>
                         {roleLabel(u.role)}
