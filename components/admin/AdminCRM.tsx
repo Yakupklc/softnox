@@ -484,32 +484,35 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
                     <td><strong>{c.sirket_adi}</strong></td>
                     <td className="dim">{c.sahip_adi}</td>
                     <td>
-                      <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
                         {c.google_maps_url && (
-                          <a href={c.google_maps_url} target="_blank" rel="noopener noreferrer" title="Google Maps" style={{ color: "#34d399", display: "flex" }}>
-                            <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 7-8 13-8 13s-8-6-8-13a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                          <a href={c.google_maps_url} target="_blank" rel="noopener noreferrer"
+                            style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#34d399", fontSize: 12, textDecoration: "none" }}>
+                            <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 7-8 13-8 13s-8-6-8-13a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                            Google Maps
                           </a>
                         )}
                         {c.website_url && (
-                          <a href={c.website_url} target="_blank" rel="noopener noreferrer" title="Web Sitesi" style={{ color: "#60a5fa", display: "flex" }}>
-                            <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/></svg>
+                          <a href={c.website_url} target="_blank" rel="noopener noreferrer"
+                            style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#60a5fa", fontSize: 12, textDecoration: "none" }}>
+                            <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/></svg>
+                            {c.website_url.replace(/^https?:\/\//, "").replace(/\/$/, "")}
                           </a>
                         )}
                         {c.email && (
-                          <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
-                            <a href={`mailto:${c.email}`} title={c.email} style={{ color: "#a78bfa", display: "flex" }}>
-                              <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+                          <div style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                            <a href={`mailto:${c.email}`}
+                              style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#a78bfa", fontSize: 12, textDecoration: "none" }}>
+                              <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+                              {c.email}
                             </a>
-                            <button
-                              onClick={() => { navigator.clipboard.writeText(c.email!); }}
-                              title="Kopyala"
-                              style={{ background: "none", border: "1px solid var(--border)", borderRadius: 4, padding: "1px 5px", cursor: "pointer", color: "var(--text-mute)", fontSize: 10, lineHeight: 1 }}
-                            >
+                            <button onClick={() => navigator.clipboard.writeText(c.email!)} title="Kopyala"
+                              style={{ background: "none", border: "1px solid var(--border)", borderRadius: 4, padding: "2px 5px", cursor: "pointer", color: "var(--text-mute)", display: "flex", alignItems: "center" }}>
                               <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                             </button>
                           </div>
                         )}
-                        {!c.google_maps_url && !c.website_url && !c.email && <span className="dim">—</span>}
+                        {!c.google_maps_url && !c.website_url && !c.email && <span style={{ color: "var(--text-mute)" }}>—</span>}
                       </div>
                     </td>
                     <td className="mono dim">{fmtDate(c.iletisim_tarihi)}</td>
