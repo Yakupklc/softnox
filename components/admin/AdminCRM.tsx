@@ -682,12 +682,16 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
                     <td>
                       <div className="crm-actions">
                         {c.sozlesme_url && (
-                          <a href={c.sozlesme_url} target="_blank" rel="noopener noreferrer">
+                          <a href={c.sozlesme_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>
                             <button className="crm-icon-btn crm-icon-btn--pdf" title="Sözleşmeyi görüntüle">
                               <PdfIcon />
                             </button>
                           </a>
                         )}
+                        <button className="crm-icon-btn" title="Geçmiş" onClick={e => { e.stopPropagation(); setDetail(c); setLogs([]); setLogsOpen(false); setTimeout(() => fetchLogs(c.id), 50); }}
+                          style={{ color: "#60a5fa" }}>
+                          <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        </button>
                         <button className="crm-icon-btn" title="Düzenle" onClick={e => { e.stopPropagation(); openEdit(c); }}>
                           <EditIcon />
                         </button>
@@ -713,11 +717,19 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
                 <div style={{ fontSize: 18, fontWeight: 700 }}>{detail.sirket_adi}</div>
                 <div style={{ fontSize: 13, color: "var(--text-mute)", marginTop: 2 }}>{detail.sahip_adi}</div>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <button onClick={() => { setLogsOpen(false); setLogs([]); fetchLogs(detail.id); }}
-                  style={{ background: "rgba(59,130,246,0.1)", border: "1px solid #3b82f633", borderRadius: 6, padding: "4px 10px", cursor: "pointer", color: "#60a5fa", fontSize: 12, display: "flex", alignItems: "center", gap: 5 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <button onClick={() => { setLogsOpen(o => !o); if (!logsOpen) fetchLogs(detail.id); }}
+                  style={{ background: logsOpen ? "rgba(59,130,246,0.2)" : "rgba(59,130,246,0.1)", border: "1px solid #3b82f633", borderRadius: 6, padding: "4px 10px", cursor: "pointer", color: "#60a5fa", fontSize: 12, display: "flex", alignItems: "center", gap: 5 }}>
                   <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                   Geçmiş
+                </button>
+                <button onClick={() => { setDetail(null); setLogsOpen(false); setLogs([]); openEdit(detail); }}
+                  style={{ background: "rgba(96,165,250,0.1)", border: "1px solid #60a5fa33", borderRadius: 6, padding: "4px 10px", cursor: "pointer", color: "#60a5fa", fontSize: 12, display: "flex", alignItems: "center", gap: 5 }}>
+                  <EditIcon /> Düzenle
+                </button>
+                <button onClick={() => { handleDelete(detail.id); setDetail(null); setLogsOpen(false); setLogs([]); }}
+                  style={{ background: "rgba(248,113,113,0.1)", border: "1px solid #f8717133", borderRadius: 6, padding: "4px 10px", cursor: "pointer", color: "#f87171", fontSize: 12, display: "flex", alignItems: "center", gap: 5 }}>
+                  <TrashIcon /> Sil
                 </button>
                 <button className="modal__close" onClick={() => { setDetail(null); setLogsOpen(false); setLogs([]); }}>✕</button>
               </div>
