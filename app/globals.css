@@ -230,6 +230,10 @@ button { font-family: inherit; }
   max-height: 0; overflow: hidden;
   transition: max-height 0.3s ease;
   z-index: 49;
+  pointer-events: none;
+}
+.nav__mobile.is-open {
+  pointer-events: all;
 }
 .nav__mobile.is-open { max-height: 600px; }
 .nav__mobile a {
