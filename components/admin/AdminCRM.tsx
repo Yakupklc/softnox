@@ -105,7 +105,7 @@ type SonucType = "Beklemede" | "Olumlu" | "Olumsuz" | "Devam Ediyor";
 const EMPTY_FORM = {
   sirket_adi: "", sahip_adi: "", telefon: "+90 ", email: "",
   website_url: "", google_maps_url: "", not_kismi: "",
-  alinan_ucret: "", anlasilan_ucret: "", iletisim_tarihi: "",
+  alinan_ucret: "", anlasilan_ucret: "", iletisim_tarihi: new Date().toISOString().split("T")[0],
   sonuc: "Beklemede" as SonucType, yapilan_isler: "", sozlesme_url: "",
 };
 
