@@ -3,6 +3,84 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
+const QUICK_LINKS = {
+  google: "https://maps.google.com/?q=Softnox",
+  website: "https://softnox.com.tr",
+  email: "info@softnox.com.tr",
+};
+
+function QuickLinks() {
+  const [copied, setCopied] = useState(false);
+  const copy = () => {
+    navigator.clipboard.writeText(QUICK_LINKS.email);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  const linkStyle = {
+    display: "inline-flex", alignItems: "center", gap: 6,
+    padding: "5px 12px", borderRadius: 7,
+    background: "rgba(255,255,255,0.03)",
+    border: "1px solid var(--border)",
+    color: "var(--text-dim)", fontSize: 12,
+    textDecoration: "none", transition: "all 0.2s",
+    fontFamily: "var(--font-mono)",
+  } as React.CSSProperties;
+
+  return (
+    <div style={{
+      display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap",
+      padding: "8px 28px",
+      borderBottom: "1px solid var(--border)",
+      background: "rgba(0,0,0,0.15)",
+    }}>
+      <a href={QUICK_LINKS.google} target="_blank" rel="noopener noreferrer" style={linkStyle}
+        onMouseOver={e => (e.currentTarget.style.color = "#34d399")}
+        onMouseOut={e => (e.currentTarget.style.color = "var(--text-dim)")}>
+        <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <path d="M20 10c0 7-8 13-8 13s-8-6-8-13a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
+        </svg>
+        Google Maps
+      </a>
+
+      <div style={{ width: 1, height: 16, background: "var(--border)" }} />
+
+      <a href={QUICK_LINKS.website} target="_blank" rel="noopener noreferrer" style={linkStyle}
+        onMouseOver={e => (e.currentTarget.style.color = "#60a5fa")}
+        onMouseOut={e => (e.currentTarget.style.color = "var(--text-dim)")}>
+        <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/>
+        </svg>
+        softnox.com.tr
+      </a>
+
+      <div style={{ width: 1, height: 16, background: "var(--border)" }} />
+
+      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+        <a href={`mailto:${QUICK_LINKS.email}`} style={linkStyle}
+          onMouseOver={e => (e.currentTarget.style.color = "#a78bfa")}
+          onMouseOut={e => (e.currentTarget.style.color = "var(--text-dim)")}>
+          <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>
+          </svg>
+          {QUICK_LINKS.email}
+        </a>
+        <button onClick={copy} title="Kopyala" style={{
+          background: "none", border: "1px solid var(--border)",
+          borderRadius: 6, padding: "4px 8px", cursor: "pointer",
+          color: copied ? "#34d399" : "var(--text-mute)", fontSize: 11,
+          transition: "all 0.2s", fontFamily: "var(--font-mono)",
+        }}>
+          {copied ? "✓" : (
+            <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+          )}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /* ===== Types ===== */
 interface Profile { full_name: string; role?: string; }
 interface Contact {
@@ -312,6 +390,9 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
           </button>
         </div>
       </div>
+
+      {/* Quick Links */}
+      <QuickLinks />
 
       {/* Main */}
       <main className="admin-main">
