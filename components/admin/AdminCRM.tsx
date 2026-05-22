@@ -93,7 +93,9 @@ interface Contact {
   google_maps_url?: string;
   not_kismi?: string;
   alinan_ucret?: number;
+  alinan_para_birimi?: string;
   anlasilan_ucret?: number;
+  anlasilan_para_birimi?: string;
   iletisim_tarihi?: string;
   sonuc?: string;
   yapilan_isler?: string;
@@ -105,12 +107,12 @@ type SonucType = "Beklemede" | "Olumlu" | "Olumsuz" | "Devam Ediyor";
 const EMPTY_FORM = {
   sirket_adi: "", sahip_adi: "", telefon: "+90 ", email: "",
   website_url: "", google_maps_url: "", not_kismi: "",
-  alinan_ucret: "", anlasilan_ucret: "", iletisim_tarihi: "",
+  alinan_ucret: "", alinan_para_birimi: "₺", anlasilan_ucret: "", anlasilan_para_birimi: "₺", iletisim_tarihi: "",
   sonuc: "Beklemede" as SonucType, yapilan_isler: "", sozlesme_url: "",
 };
 
 /* ===== Helpers ===== */
-const fmt = (n?: number) => n != null ? `₺${n.toLocaleString("tr-TR")}` : "—";
+const fmt = (n?: number, cur?: string) => n != null ? `${cur ?? "₺"}${n.toLocaleString("tr-TR")}` : "—";
 const fmtDate = (d?: string) => d ? new Date(d).toLocaleDateString("tr-TR") : "—";
 
 /* ===== Logo ===== */
@@ -225,7 +227,9 @@ function ContactModal({
     google_maps_url: contact?.google_maps_url ?? "",
     not_kismi: contact?.not_kismi ?? "",
     alinan_ucret: contact?.alinan_ucret != null ? contact.alinan_ucret.toLocaleString("tr-TR") : "",
+    alinan_para_birimi: contact?.alinan_para_birimi ?? "₺",
     anlasilan_ucret: contact?.anlasilan_ucret != null ? contact.anlasilan_ucret.toLocaleString("tr-TR") : "",
+    anlasilan_para_birimi: contact?.anlasilan_para_birimi ?? "₺",
     iletisim_tarihi: contact?.iletisim_tarihi ?? new Date().toISOString().split("T")[0],
     sonuc: (contact?.sonuc ?? "Beklemede") as SonucType,
     yapilan_isler: contact?.yapilan_isler ?? "",
@@ -294,26 +298,38 @@ function ContactModal({
               {(form.sonuc === "Olumlu" || form.sonuc === "Devam Ediyor") && (
                 <div style={{ gridColumn: "1 / -1", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                   <label className="field">
-                    <span className="field__lbl" style={{ color: "#4ade80" }}>Alınan Ücret (₺)</span>
-                    <input type="text" inputMode="numeric" value={form.alinan_ucret}
-                      onChange={e => {
-                        const raw = e.target.value.replace(/\./g, "").replace(/[^0-9,]/g, "");
-                        const parts = raw.split(",");
-                        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-                        set("alinan_ucret", parts.join(","));
-                      }}
-                      placeholder="0" style={{ borderColor: "#4ade8033", color: "#4ade80" }} />
+                    <span className="field__lbl" style={{ color: "#4ade80" }}>Alınan Ücret</span>
+                    <div style={{ display: "flex", gap: 6 }}>
+                      <select value={form.alinan_para_birimi} onChange={e => set("alinan_para_birimi", e.target.value)}
+                        style={{ width: 72, flexShrink: 0, borderColor: "#4ade8033", color: "#4ade80", fontWeight: 600 }}>
+                        <option>₺</option><option>$</option><option>€</option><option>£</option>
+                      </select>
+                      <input type="text" inputMode="numeric" value={form.alinan_ucret}
+                        onChange={e => {
+                          const raw = e.target.value.replace(/\./g, "").replace(/[^0-9,]/g, "");
+                          const parts = raw.split(",");
+                          parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                          set("alinan_ucret", parts.join(","));
+                        }}
+                        placeholder="0" style={{ borderColor: "#4ade8033", color: "#4ade80" }} />
+                    </div>
                   </label>
                   <label className="field">
-                    <span className="field__lbl" style={{ color: "#f87171" }}>Anlaşılan Ücret (₺)</span>
-                    <input type="text" inputMode="numeric" value={form.anlasilan_ucret}
-                      onChange={e => {
-                        const raw = e.target.value.replace(/\./g, "").replace(/[^0-9,]/g, "");
-                        const parts = raw.split(",");
-                        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-                        set("anlasilan_ucret", parts.join(","));
-                      }}
-                      placeholder="0" style={{ borderColor: "#f8717133", color: "#f87171" }} />
+                    <span className="field__lbl" style={{ color: "#f87171" }}>Anlaşılan Ücret</span>
+                    <div style={{ display: "flex", gap: 6 }}>
+                      <select value={form.anlasilan_para_birimi} onChange={e => set("anlasilan_para_birimi", e.target.value)}
+                        style={{ width: 72, flexShrink: 0, borderColor: "#f8717133", color: "#f87171", fontWeight: 600 }}>
+                        <option>₺</option><option>$</option><option>€</option><option>£</option>
+                      </select>
+                      <input type="text" inputMode="numeric" value={form.anlasilan_ucret}
+                        onChange={e => {
+                          const raw = e.target.value.replace(/\./g, "").replace(/[^0-9,]/g, "");
+                          const parts = raw.split(",");
+                          parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                          set("anlasilan_ucret", parts.join(","));
+                        }}
+                        placeholder="0" style={{ borderColor: "#f8717133", color: "#f87171" }} />
+                    </div>
                   </label>
                 </div>
               )}
@@ -578,8 +594,8 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
                       </div>
                     </td>
                     <td className="mono dim">{fmtDate(c.iletisim_tarihi)}</td>
-                    <td className="mono">{fmt(c.alinan_ucret)}</td>
-                    <td className="mono">{fmt(c.anlasilan_ucret)}</td>
+                    <td className="mono" style={{ color: c.alinan_ucret != null ? "#4ade80" : undefined }}>{fmt(c.alinan_ucret, c.alinan_para_birimi)}</td>
+                    <td className="mono" style={{ color: c.anlasilan_ucret != null ? "#f87171" : undefined }}>{fmt(c.anlasilan_ucret, c.anlasilan_para_birimi)}</td>
                     <td>
                       <span className={badgeClass(c.sonuc)}>{c.sonuc ?? "Beklemede"}</span>
                     </td>
