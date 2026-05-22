@@ -177,6 +177,9 @@ function PhoneContact({ telefon }: { telefon: string }) {
   );
 }
 
+const BADGE_COLORS: Record<string, string> = {
+  "Olumlu": "#4ade80", "Olumsuz": "#f87171", "Devam Ediyor": "#60a5fa", "Beklemede": "#fbbf24",
+};
 const DetailRow = ({ label, value, color, href, badge, multiline }: {
   label: string; value: string; color?: string; href?: string; badge?: boolean; multiline?: boolean;
 }) => (
@@ -186,7 +189,9 @@ const DetailRow = ({ label, value, color, href, badge, multiline }: {
       <a href={href} target="_blank" rel="noopener noreferrer"
         style={{ color: color ?? "var(--text-base)", fontSize: 14, textDecoration: "none", fontWeight: 500 }}>{value}</a>
     ) : badge ? (
-      <span style={{ display: "inline-block", width: "fit-content" }}><span className={badgeClass(value)}>{value}</span></span>
+      <span style={{ display: "inline-block", width: "fit-content", padding: "2px 10px", borderRadius: 999, fontSize: 12, fontWeight: 600,
+        background: `${BADGE_COLORS[value] ?? "#fbbf24"}22`, color: BADGE_COLORS[value] ?? "#fbbf24",
+        border: `1px solid ${BADGE_COLORS[value] ?? "#fbbf24"}44` }}>{value}</span>
     ) : (
       <span style={{ color: color ?? "var(--text-base)", fontSize: 14, fontWeight: 500, whiteSpace: multiline ? "pre-wrap" : "normal" }}>{value}</span>
     )}
