@@ -43,6 +43,23 @@ html { scroll-behavior: smooth; }
 }
 ::-webkit-scrollbar-corner { background: var(--bg-1); }
 * { scrollbar-width: thin; scrollbar-color: #3b82f644 var(--bg-1); }
+
+/* ===== Date picker ===== */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.6) sepia(1) saturate(3) hue-rotate(190deg) brightness(1.2);
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 2px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
+input[type="date"]::-webkit-datetime-edit { color: var(--text-base); }
+input[type="date"]::-webkit-datetime-edit-fields-wrapper { color: var(--text-base); }
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field { color: var(--text-base); }
+input[type="date"]::-webkit-datetime-edit-text { color: var(--text-mute); }
 html, body { margin: 0; padding: 0; max-width: 100%; overflow-x: hidden; }
 body {
   font-family: var(--font-sans);
@@ -1015,6 +1032,7 @@ button { font-family: inherit; }
   background: rgba(0,0,0,0.25);
   border: 1px solid var(--border);
   border-radius: 10px;
+  color-scheme: dark;
   color: var(--text);
   font-family: inherit;
   font-size: 14.5px;
