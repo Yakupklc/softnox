@@ -178,6 +178,9 @@ button { font-family: inherit; }
   z-index: 50;
   height: var(--nav-h);
   transition: all 0.3s ease;
+  background: rgba(6, 9, 18, 0.85);
+  backdrop-filter: blur(16px) saturate(140%);
+  border-bottom: 1px solid var(--border);
 }
 .nav__inner {
   max-width: var(--container);

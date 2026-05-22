@@ -138,9 +138,6 @@ const Nav = ({ active, onJump }: { active: string; onJump: (id: string) => void 
             <span>{it.label}</span><ArrowRight size={16} />
           </a>
         ))}
-        <button className="btn btn--primary" onClick={() => jump("iletisim")} style={{ margin: "8px 16px" }}>
-          Teklif Al <ArrowRight size={14} />
-        </button>
       </div>
     </header>
   );
