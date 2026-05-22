@@ -475,15 +475,6 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
     setLogsOpen(true);
   };
 
-  const saveLog = async (contactId: string, action: string, changes: Record<string, any>) => {
-    await supabase.from("contact_logs").insert({
-      contact_id: contactId,
-      user_name: profile.full_name,
-      action,
-      changes,
-    });
-  };
-
   const handleSave = async (formData: any, file?: File) => {
     const isNew = !modal.contact?.id;
     let sozlesme_url = modal.contact?.sozlesme_url ?? null;
@@ -514,34 +505,15 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
       const { data, error } = await supabase.from("contacts").insert(payload).select().single();
       if (!error && data) {
         setContacts(prev => [data, ...prev]);
-        await saveLog(data.id, "olusturuldu", { sirket_adi: data.sirket_adi });
       }
     } else {
       const old = modal.contact as Contact;
       const { data, error } = await supabase.from("contacts").update(payload).eq("id", old.id).select().single();
       if (!error && data) {
         setContacts(prev => prev.map(c => c.id === data.id ? data : c));
-        // Detay kartı açıksa güncel veriyi yansıt
         setDetail(prev => prev?.id === data.id ? data : prev);
-        const LABELS: Record<string, string> = {
-          sirket_adi: "Şirket Adı", sahip_adi: "Sahip", telefon: "Telefon", email: "E-posta",
-          website_url: "Web Sitesi", google_maps_url: "Google Maps", not_kismi: "Not",
-          alinan_ucret: "Alınan Ücret", anlasilan_ucret: "Anlaşılan Ücret", kalan_ucret: "Kalan Ücret",
-          iletisim_tarihi: "İletişim Tarihi", sonuc: "Sonuç", yapilan_isler: "Yapılan İşler",
-        };
-        const changes: Record<string, { eski: any; yeni: any }> = {};
-        for (const key of Object.keys(LABELS)) {
-          const eski = (old as any)[key];
-          const yeni = (data as any)[key];
-          if (String(eski ?? "") !== String(yeni ?? "")) {
-            changes[LABELS[key]] = { eski: eski ?? "—", yeni: yeni ?? "—" };
-          }
-        }
-        if (Object.keys(changes).length > 0) {
-          await saveLog(old.id, "guncellendi", changes);
-          // Geçmiş paneli açıksa otomatik yenile
-          if (logsOpen) await fetchLogs(old.id);
-        }
+        // Geçmiş paneli açıksa trigger'ın yazdığı logu çek
+        if (logsOpen) await fetchLogs(old.id);
       }
     }
     closeModal();
