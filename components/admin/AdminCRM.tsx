@@ -292,14 +292,18 @@ function ContactModal({
                 </select>
               </FormField>
               {(form.sonuc === "Olumlu" || form.sonuc === "Devam Ediyor") && (
-                <>
-                  <FormField label="Alınan Ücret (₺)">
-                    <input type="number" min="0" step="0.01" value={form.alinan_ucret} onChange={e => set("alinan_ucret", e.target.value)} placeholder="0.00" />
-                  </FormField>
-                  <FormField label="Anlaşılan Ücret (₺)">
-                    <input type="number" min="0" step="0.01" value={form.anlasilan_ucret} onChange={e => set("anlasilan_ucret", e.target.value)} placeholder="0.00" />
-                  </FormField>
-                </>
+                <div style={{ gridColumn: "1 / -1", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                  <label className="field">
+                    <span className="field__lbl" style={{ color: "#4ade80" }}>Alınan Ücret (₺)</span>
+                    <input type="number" min="0" step="0.01" value={form.alinan_ucret} onChange={e => set("alinan_ucret", e.target.value)} placeholder="0.00"
+                      style={{ borderColor: "#4ade8033", color: "#4ade80" }} />
+                  </label>
+                  <label className="field">
+                    <span className="field__lbl" style={{ color: "#f87171" }}>Anlaşılan Ücret (₺)</span>
+                    <input type="number" min="0" step="0.01" value={form.anlasilan_ucret} onChange={e => set("anlasilan_ucret", e.target.value)} placeholder="0.00"
+                      style={{ borderColor: "#f8717133", color: "#f87171" }} />
+                  </label>
+                </div>
               )}
             </div>
 
