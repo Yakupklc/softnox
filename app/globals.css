@@ -243,10 +243,7 @@ button { font-family: inherit; }
 @media (max-width: 960px) {
   .nav__links { display: none; }
   .nav__burger { display: inline-flex; }
-  .nav__cta .btn { display: inline-flex; }
-}
-@media (max-width: 480px) {
-  .nav__cta .btn { display: none; }
+  .nav__cta .btn { display: inline-flex; font-size: 12px; padding: 8px 12px; }
 }
 
 /* ===== Section base ===== */
