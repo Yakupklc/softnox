@@ -521,6 +521,8 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
       const { data, error } = await supabase.from("contacts").update(payload).eq("id", old.id).select().single();
       if (!error && data) {
         setContacts(prev => prev.map(c => c.id === data.id ? data : c));
+        // Detay kartı açıksa güncel veriyi yansıt
+        setDetail(prev => prev?.id === data.id ? data : prev);
         const LABELS: Record<string, string> = {
           sirket_adi: "Şirket Adı", sahip_adi: "Sahip", telefon: "Telefon", email: "E-posta",
           website_url: "Web Sitesi", google_maps_url: "Google Maps", not_kismi: "Not",
@@ -537,6 +539,8 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
         }
         if (Object.keys(changes).length > 0) {
           await saveLog(old.id, "guncellendi", changes);
+          // Geçmiş paneli açıksa otomatik yenile
+          if (logsOpen) await fetchLogs(old.id);
         }
       }
     }
@@ -659,7 +663,7 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
                     </td>
                   </tr>
                 ) : filtered.map(c => (
-                  <tr key={c.id} onClick={() => setDetail(c)} style={{ cursor: "pointer" }}>
+                  <tr key={c.id} onClick={() => { setDetail(c); setLogsOpen(false); setLogs([]); }} style={{ cursor: "pointer" }}>
                     <td><strong>{c.sirket_adi}</strong></td>
                     <td className="dim">{c.sahip_adi}</td>
                     <td>
