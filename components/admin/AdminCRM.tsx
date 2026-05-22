@@ -103,7 +103,7 @@ interface Contact {
 type SonucType = "Beklemede" | "Olumlu" | "Olumsuz" | "Devam Ediyor";
 
 const EMPTY_FORM = {
-  sirket_adi: "", sahip_adi: "", telefon: "", email: "",
+  sirket_adi: "", sahip_adi: "", telefon: "+90 ", email: "",
   website_url: "", google_maps_url: "", not_kismi: "",
   alinan_ucret: "", anlasilan_ucret: "", iletisim_tarihi: "",
   sonuc: "Beklemede" as SonucType, yapilan_isler: "", sozlesme_url: "",
@@ -219,7 +219,7 @@ function ContactModal({
   const [form, setForm] = useState({
     sirket_adi: contact?.sirket_adi ?? "",
     sahip_adi: contact?.sahip_adi ?? "",
-    telefon: contact?.telefon ?? "",
+    telefon: contact?.telefon || "+90 ",
     email: contact?.email ?? "",
     website_url: contact?.website_url ?? "",
     google_maps_url: contact?.google_maps_url ?? "",
@@ -387,7 +387,11 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
       }
     }
 
-    const payload = { ...formData, sozlesme_url };
+    const payload = {
+      ...formData,
+      telefon: formData.telefon?.trim() === "+90" || formData.telefon?.trim() === "+90 " ? "" : formData.telefon,
+      sozlesme_url,
+    };
 
     if (isNew) {
       const { data, error } = await supabase.from("contacts").insert(payload).select().single();
