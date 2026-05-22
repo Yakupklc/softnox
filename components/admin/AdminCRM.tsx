@@ -177,6 +177,22 @@ function PhoneContact({ telefon }: { telefon: string }) {
   );
 }
 
+const DetailRow = ({ label, value, color, href, badge, multiline }: {
+  label: string; value: string; color?: string; href?: string; badge?: boolean; multiline?: boolean;
+}) => (
+  <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+    <span style={{ fontSize: 11, color: "var(--text-mute)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</span>
+    {href ? (
+      <a href={href} target="_blank" rel="noopener noreferrer"
+        style={{ color: color ?? "var(--text-base)", fontSize: 14, textDecoration: "none", fontWeight: 500 }}>{value}</a>
+    ) : badge ? (
+      <span style={{ display: "inline-block", width: "fit-content" }}><span className={badgeClass(value)}>{value}</span></span>
+    ) : (
+      <span style={{ color: color ?? "var(--text-base)", fontSize: 14, fontWeight: 500, whiteSpace: multiline ? "pre-wrap" : "normal" }}>{value}</span>
+    )}
+  </div>
+);
+
 const PdfIcon = () => (
   <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" />
@@ -395,6 +411,7 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
   const [contacts, setContacts] = useState<Contact[]>(initialContacts);
   const [search, setSearch] = useState("");
   const [modal, setModal] = useState<{ open: boolean; contact: Partial<Contact> | null }>({ open: false, contact: null });
+  const [detail, setDetail] = useState<Contact | null>(null);
 
   const initials = profile.full_name.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase();
 
@@ -566,7 +583,7 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
                     </td>
                   </tr>
                 ) : filtered.map(c => (
-                  <tr key={c.id}>
+                  <tr key={c.id} onClick={() => setDetail(c)} style={{ cursor: "pointer" }}>
                     <td><strong>{c.sirket_adi}</strong></td>
                     <td className="dim">{c.sahip_adi}</td>
                     <td>
@@ -619,10 +636,10 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
                             </button>
                           </a>
                         )}
-                        <button className="crm-icon-btn" title="Düzenle" onClick={() => openEdit(c)}>
+                        <button className="crm-icon-btn" title="Düzenle" onClick={e => { e.stopPropagation(); openEdit(c); }}>
                           <EditIcon />
                         </button>
-                        <button className="crm-icon-btn crm-icon-btn--danger" title="Sil" onClick={() => handleDelete(c.id)}>
+                        <button className="crm-icon-btn crm-icon-btn--danger" title="Sil" onClick={e => { e.stopPropagation(); handleDelete(c.id); }}>
                           <TrashIcon />
                         </button>
                       </div>
@@ -635,7 +652,40 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
         </div>
       </main>
 
-      {/* Modal */}
+      {/* Detail Card */}
+      {detail && (
+        <div className="modal-overlay" onClick={() => setDetail(null)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 480 }}>
+            <div className="modal__head">
+              <div>
+                <div style={{ fontSize: 18, fontWeight: 700 }}>{detail.sirket_adi}</div>
+                <div style={{ fontSize: 13, color: "var(--text-mute)", marginTop: 2 }}>{detail.sahip_adi}</div>
+              </div>
+              <button className="modal__close" onClick={() => setDetail(null)}>✕</button>
+            </div>
+            <div className="modal__body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {detail.telefon && <DetailRow label="Telefon" value={detail.telefon} color="#fbbf24" />}
+              {detail.email && <DetailRow label="E-posta" value={detail.email} color="#a78bfa" />}
+              {detail.website_url && <DetailRow label="Web Sitesi" value={detail.website_url} color="#60a5fa" />}
+              {detail.google_maps_url && <DetailRow label="Google Maps" value="Haritada Gör" href={detail.google_maps_url} color="#34d399" />}
+              {detail.iletisim_tarihi && <DetailRow label="İletişim Tarihi" value={fmtDate(detail.iletisim_tarihi)} />}
+              {detail.sonuc && <DetailRow label="Sonuç" value={detail.sonuc} badge />}
+              {(detail.alinan_ucret != null) && <DetailRow label="Alınan Ücret" value={fmt(detail.alinan_ucret, detail.alinan_para_birimi)} color="#4ade80" />}
+              {(detail.anlasilan_ucret != null) && <DetailRow label="Anlaşılan Ücret" value={fmt(detail.anlasilan_ucret, detail.anlasilan_para_birimi)} color="#f87171" />}
+              {detail.not_kismi && <DetailRow label="Not" value={detail.not_kismi} multiline />}
+              {detail.yapilan_isler && <DetailRow label="Yapılan İşler" value={detail.yapilan_isler} multiline />}
+              {detail.sozlesme_url && (
+                <a href={detail.sozlesme_url} target="_blank" rel="noopener noreferrer"
+                  style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "var(--accent)", fontSize: 13, textDecoration: "none", padding: "8px 0" }}>
+                  <PdfIcon /> Sözleşmeyi Görüntüle
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
       {modal.open && (
         <ContactModal
           contact={modal.contact}
