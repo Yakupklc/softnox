@@ -105,7 +105,7 @@ type SonucType = "Beklemede" | "Olumlu" | "Olumsuz" | "Devam Ediyor";
 const EMPTY_FORM = {
   sirket_adi: "", sahip_adi: "", telefon: "+90 ", email: "",
   website_url: "", google_maps_url: "", not_kismi: "",
-  alinan_ucret: "", anlasilan_ucret: "", iletisim_tarihi: new Date().toISOString().split("T")[0],
+  alinan_ucret: "", anlasilan_ucret: "", iletisim_tarihi: "",
   sonuc: "Beklemede" as SonucType, yapilan_isler: "", sozlesme_url: "",
 };
 
@@ -226,7 +226,7 @@ function ContactModal({
     not_kismi: contact?.not_kismi ?? "",
     alinan_ucret: contact?.alinan_ucret != null ? String(contact.alinan_ucret) : "",
     anlasilan_ucret: contact?.anlasilan_ucret != null ? String(contact.anlasilan_ucret) : "",
-    iletisim_tarihi: contact?.iletisim_tarihi ?? "",
+    iletisim_tarihi: contact?.iletisim_tarihi ?? new Date().toISOString().split("T")[0],
     sonuc: (contact?.sonuc ?? "Beklemede") as SonucType,
     yapilan_isler: contact?.yapilan_isler ?? "",
   });
