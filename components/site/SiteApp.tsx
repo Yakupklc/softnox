@@ -571,18 +571,34 @@ const Field = ({ label, value, onChange, type = "text", textarea, err, optional 
 const Contact = () => {
   const [form, setForm] = useState({ name: "", company: "", email: "", phone: "", msg: "" });
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sendErr, setSendErr] = useState("");
   const [err, setErr] = useState<Record<string, string>>({});
   const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }));
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const e2: Record<string, string> = {};
     if (!form.name.trim()) e2.name = "Ad soyad gerekli";
     if (!form.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) e2.email = "Geçerli bir e-posta giriniz";
     if (!form.msg.trim() || form.msg.length < 10) e2.msg = "Lütfen kısa bir mesaj yazın (min 10 karakter)";
     setErr(e2);
-    if (Object.keys(e2).length === 0) {
+    if (Object.keys(e2).length > 0) return;
+    setSending(true);
+    setSendErr("");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error("Gönderim başarısız");
       setSent(true);
-      setTimeout(() => { setSent(false); setForm({ name: "", company: "", email: "", phone: "", msg: "" }); }, 4000);
+      setForm({ name: "", company: "", email: "", phone: "", msg: "" });
+      setTimeout(() => setSent(false), 5000);
+    } catch {
+      setSendErr("Mesaj gönderilemedi, lütfen tekrar deneyin.");
+    } finally {
+      setSending(false);
     }
   };
   return (
@@ -618,9 +634,11 @@ const Contact = () => {
             </div>
             <Field label="Mesajınız" textarea value={form.msg} onChange={(v: string) => set("msg", v)} err={err.msg} />
             <div className="form__foot">
-              <span className="form__hint">Gönderdiğinizde size 24 saat içinde dönüş sağlarız.</span>
-              <button className={`btn btn--primary ${sent ? "is-sent" : ""}`} type="submit">
-                {sent ? <><Check size={16} /> Gönderildi</> : <>Mesajı Gönder <ArrowRight size={16} /></>}
+              <span className="form__hint">
+                {sendErr ? <span style={{ color: "#f87171" }}>{sendErr}</span> : "Gönderdiğinizde size 24 saat içinde dönüş sağlarız."}
+              </span>
+              <button className={`btn btn--primary ${sent ? "is-sent" : ""}`} type="submit" disabled={sending}>
+                {sent ? <><Check size={16} /> Gönderildi</> : sending ? "Gönderiliyor..." : <>Mesajı Gönder <ArrowRight size={16} /></>}
               </button>
             </div>
           </form>
