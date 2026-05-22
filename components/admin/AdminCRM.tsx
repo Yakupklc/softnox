@@ -570,7 +570,7 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
                   <th>İletişim</th>
                   <th>Tarih</th>
                   <th>Alınan Ücret</th>
-                  <th>Anlaşılan Ücret</th>
+                  <th>Kalan Ücret</th>
                   <th>Sonuç</th>
                   <th>İşlemler</th>
                 </tr>
@@ -628,7 +628,12 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
                     </td>
                     <td className="mono dim">{fmtDate(c.iletisim_tarihi)}</td>
                     <td className="mono" style={{ color: c.alinan_ucret != null ? "#4ade80" : undefined }}>{fmt(c.alinan_ucret, c.alinan_para_birimi)}</td>
-                    <td className="mono" style={{ color: c.anlasilan_ucret != null ? "#f87171" : undefined }}>{fmt(c.anlasilan_ucret, c.anlasilan_para_birimi)}</td>
+                    <td className="mono">{(() => {
+                      if (c.anlasilan_ucret == null) return <span style={{ color: "var(--text-mute)" }}>—</span>;
+                      const kalan = c.anlasilan_ucret - (c.alinan_ucret ?? 0);
+                      const color = kalan > 0 ? "#f87171" : kalan < 0 ? "#4ade80" : "var(--text-mute)";
+                      return <span style={{ color }}>{fmt(kalan, c.anlasilan_para_birimi)}</span>;
+                    })()}</td>
                     <td>
                       <span className={badgeClass(c.sonuc)}>{c.sonuc ?? "Beklemede"}</span>
                     </td>
