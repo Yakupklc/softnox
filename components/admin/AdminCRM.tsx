@@ -198,9 +198,9 @@ const LogoutIcon = () => (
 );
 
 /* ===== Field ===== */
-const FormField = ({ label, children, optional }: { label: string; children: React.ReactNode; optional?: boolean }) => (
+const FormField = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <label className="field">
-    <span className="field__lbl">{label}{optional && <em> (opsiyonel)</em>}</span>
+    <span className="field__lbl">{label}</span>
     {children}
   </label>
 );
@@ -264,19 +264,19 @@ function ContactModal({
               <FormField label="Sahip / Yetkili">
                 <input value={form.sahip_adi} onChange={e => set("sahip_adi", e.target.value)} required placeholder="Ad Soyad" />
               </FormField>
-              <FormField label="Telefon" optional>
+              <FormField label="Telefon">
                 <input value={form.telefon} onChange={e => set("telefon", e.target.value)} placeholder="+90 5__ ___ __ __" />
               </FormField>
-              <FormField label="E-posta" optional>
+              <FormField label="E-posta">
                 <input type="email" value={form.email} onChange={e => set("email", e.target.value)} placeholder="ornek@firma.com" />
               </FormField>
-              <FormField label="İletişim Tarihi" optional>
+              <FormField label="İletişim Tarihi">
                 <input type="date" value={form.iletisim_tarihi} onChange={e => set("iletisim_tarihi", e.target.value)} />
               </FormField>
-              <FormField label="Web Sitesi" optional>
+              <FormField label="Web Sitesi">
                 <input value={form.website_url} onChange={e => set("website_url", e.target.value)} placeholder="https://firma.com" />
               </FormField>
-              <FormField label="Google Maps Linki" optional>
+              <FormField label="Google Maps Linki">
                 <input value={form.google_maps_url} onChange={e => set("google_maps_url", e.target.value)} placeholder="https://maps.google.com/..." />
               </FormField>
             </div>
@@ -293,10 +293,10 @@ function ContactModal({
               </FormField>
               {(form.sonuc === "Olumlu" || form.sonuc === "Devam Ediyor") && (
                 <>
-                  <FormField label="Alınan Ücret (₺)" optional>
+                  <FormField label="Alınan Ücret (₺)">
                     <input type="number" min="0" step="0.01" value={form.alinan_ucret} onChange={e => set("alinan_ucret", e.target.value)} placeholder="0.00" />
                   </FormField>
-                  <FormField label="Anlaşılan Ücret (₺)" optional>
+                  <FormField label="Anlaşılan Ücret (₺)">
                     <input type="number" min="0" step="0.01" value={form.anlasilan_ucret} onChange={e => set("anlasilan_ucret", e.target.value)} placeholder="0.00" />
                   </FormField>
                 </>
@@ -304,10 +304,10 @@ function ContactModal({
             </div>
 
             <p className="modal__section-title">Notlar & İşler</p>
-            <FormField label="Not" optional>
+            <FormField label="Not">
               <textarea rows={3} value={form.not_kismi} onChange={e => set("not_kismi", e.target.value)} placeholder="Genel notlar..." />
             </FormField>
-            <FormField label="Yapılan İşler" optional>
+            <FormField label="Yapılan İşler">
               <textarea rows={3} value={form.yapilan_isler} onChange={e => set("yapilan_isler", e.target.value)} placeholder="Gerçekleştirilen işler, görüşmeler..." />
             </FormField>
 
