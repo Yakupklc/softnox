@@ -109,7 +109,7 @@ type SonucType = "Beklemede" | "Olumlu" | "Olumsuz" | "Devam Ediyor";
 const EMPTY_FORM = {
   sirket_adi: "", sahip_adi: "", telefon: "+90 ", email: "",
   website_url: "", google_maps_url: "", not_kismi: "",
-  alinan_ucret: "", alinan_para_birimi: "₺", anlasilan_ucret: "", anlasilan_para_birimi: "₺", kalan_ucret: "", kalan_para_birimi: "₺", iletisim_tarihi: "",
+  alinan_ucret: "", alinan_para_birimi: "₺", anlasilan_ucret: "", anlasilan_para_birimi: "₺", iletisim_tarihi: "",
   sonuc: "Beklemede" as SonucType, yapilan_isler: "", sozlesme_url: "",
 };
 
@@ -253,8 +253,6 @@ function ContactModal({
     alinan_para_birimi: contact?.alinan_para_birimi ?? "₺",
     anlasilan_ucret: contact?.anlasilan_ucret != null ? contact.anlasilan_ucret.toLocaleString("tr-TR") : "",
     anlasilan_para_birimi: contact?.anlasilan_para_birimi ?? "₺",
-    kalan_ucret: contact?.kalan_ucret != null ? contact.kalan_ucret.toLocaleString("tr-TR") : "",
-    kalan_para_birimi: contact?.kalan_para_birimi ?? "₺",
     iletisim_tarihi: contact?.iletisim_tarihi ?? new Date().toISOString().split("T")[0],
     sonuc: (contact?.sonuc ?? "Beklemede") as SonucType,
     yapilan_isler: contact?.yapilan_isler ?? "",
@@ -271,7 +269,6 @@ function ContactModal({
       ...form,
       alinan_ucret: form.alinan_ucret ? parseFloat(form.alinan_ucret.replace(/\./g, "").replace(",", ".")) : null,
       anlasilan_ucret: form.anlasilan_ucret ? parseFloat(form.anlasilan_ucret.replace(/\./g, "").replace(",", ".")) : null,
-      kalan_ucret: form.kalan_ucret ? parseFloat(form.kalan_ucret.replace(/\./g, "").replace(",", ".")) : null,
       iletisim_tarihi: form.iletisim_tarihi || null,
     }, file ?? undefined);
     setSaving(false);
@@ -357,23 +354,21 @@ function ContactModal({
                       </select>
                     </div>
                   </label>
-                  <label className="field" style={{ gridColumn: "1 / -1" }}>
-                    <span className="field__lbl" style={{ color: "#a78bfa" }}>Kalan Ücret</span>
-                    <div style={{ display: "flex", gap: 6 }}>
-                      <input type="text" inputMode="numeric" value={form.kalan_ucret}
-                        onChange={e => {
-                          const raw = e.target.value.replace(/\./g, "").replace(/[^0-9,]/g, "");
-                          const parts = raw.split(",");
-                          parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-                          set("kalan_ucret", parts.join(","));
-                        }}
-                        placeholder="0" style={{ borderColor: "#a78bfa33", color: "#a78bfa" }} />
-                      <select value={form.kalan_para_birimi} onChange={e => set("kalan_para_birimi", e.target.value)}
-                        style={{ width: 72, flexShrink: 0, borderColor: "#a78bfa33", color: "#a78bfa", fontWeight: 600 }}>
-                        <option>₺</option><option>$</option><option>€</option><option>£</option>
-                      </select>
-                    </div>
-                  </label>
+                  {/* Kalan ücret otomatik hesaplanır: anlaşılan - alınan */}
+                  {(() => {
+                    const alinan = form.alinan_ucret ? parseFloat(form.alinan_ucret.replace(/\./g, "").replace(",", ".")) : null;
+                    const anlasilan = form.anlasilan_ucret ? parseFloat(form.anlasilan_ucret.replace(/\./g, "").replace(",", ".")) : null;
+                    const kalan = (anlasilan != null && alinan != null) ? anlasilan - alinan : null;
+                    if (kalan == null) return null;
+                    return (
+                      <div style={{ gridColumn: "1 / -1", padding: "8px 12px", borderRadius: 8, background: "#a78bfa11", border: "1px solid #a78bfa33", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                        <span style={{ fontSize: 12, color: "#a78bfa", fontWeight: 500 }}>Kalan Ücret (otomatik)</span>
+                        <span style={{ fontSize: 15, fontWeight: 700, color: "#a78bfa", fontFamily: "var(--font-mono)" }}>
+                          {form.anlasilan_para_birimi}{kalan.toLocaleString("tr-TR")}
+                        </span>
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
             </div>
@@ -439,6 +434,9 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
   const [search, setSearch] = useState("");
   const [modal, setModal] = useState<{ open: boolean; contact: Partial<Contact> | null }>({ open: false, contact: null });
   const [detail, setDetail] = useState<Contact | null>(null);
+  const [logs, setLogs] = useState<any[]>([]);
+  const [logsOpen, setLogsOpen] = useState(false);
+  const [logsLoading, setLogsLoading] = useState(false);
 
   const initials = profile.full_name.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase();
 
@@ -465,6 +463,27 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
   const openEdit = (c: Contact) => setModal({ open: true, contact: c });
   const closeModal = () => setModal({ open: false, contact: null });
 
+  const fetchLogs = async (contactId: string) => {
+    setLogsLoading(true);
+    const { data } = await supabase
+      .from("contact_logs")
+      .select("*")
+      .eq("contact_id", contactId)
+      .order("created_at", { ascending: false });
+    setLogs(data ?? []);
+    setLogsLoading(false);
+    setLogsOpen(true);
+  };
+
+  const saveLog = async (contactId: string, action: string, changes: Record<string, any>) => {
+    await supabase.from("contact_logs").insert({
+      contact_id: contactId,
+      user_name: profile.full_name,
+      action,
+      changes,
+    });
+  };
+
   const handleSave = async (formData: any, file?: File) => {
     const isNew = !modal.contact?.id;
     let sozlesme_url = modal.contact?.sozlesme_url ?? null;
@@ -478,18 +497,48 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
       }
     }
 
+    const alinan = formData.alinan_ucret ?? null;
+    const anlasilan = formData.anlasilan_ucret ?? null;
+    const kalan_ucret = (anlasilan != null && alinan != null) ? anlasilan - alinan : null;
+    const kalan_para_birimi = formData.anlasilan_para_birimi ?? "₺";
+
     const payload = {
       ...formData,
       telefon: formData.telefon?.trim() === "+90" || formData.telefon?.trim() === "+90 " ? "" : formData.telefon,
+      kalan_ucret,
+      kalan_para_birimi,
       sozlesme_url,
     };
 
     if (isNew) {
       const { data, error } = await supabase.from("contacts").insert(payload).select().single();
-      if (!error && data) setContacts(prev => [data, ...prev]);
+      if (!error && data) {
+        setContacts(prev => [data, ...prev]);
+        await saveLog(data.id, "olusturuldu", { sirket_adi: data.sirket_adi });
+      }
     } else {
-      const { data, error } = await supabase.from("contacts").update(payload).eq("id", modal.contact!.id).select().single();
-      if (!error && data) setContacts(prev => prev.map(c => c.id === data.id ? data : c));
+      const old = modal.contact as Contact;
+      const { data, error } = await supabase.from("contacts").update(payload).eq("id", old.id).select().single();
+      if (!error && data) {
+        setContacts(prev => prev.map(c => c.id === data.id ? data : c));
+        const LABELS: Record<string, string> = {
+          sirket_adi: "Şirket Adı", sahip_adi: "Sahip", telefon: "Telefon", email: "E-posta",
+          website_url: "Web Sitesi", google_maps_url: "Google Maps", not_kismi: "Not",
+          alinan_ucret: "Alınan Ücret", anlasilan_ucret: "Anlaşılan Ücret", kalan_ucret: "Kalan Ücret",
+          iletisim_tarihi: "İletişim Tarihi", sonuc: "Sonuç", yapilan_isler: "Yapılan İşler",
+        };
+        const changes: Record<string, { eski: any; yeni: any }> = {};
+        for (const key of Object.keys(LABELS)) {
+          const eski = (old as any)[key];
+          const yeni = (data as any)[key];
+          if (String(eski ?? "") !== String(yeni ?? "")) {
+            changes[LABELS[key]] = { eski: eski ?? "—", yeni: yeni ?? "—" };
+          }
+        }
+        if (Object.keys(changes).length > 0) {
+          await saveLog(old.id, "guncellendi", changes);
+        }
+      }
     }
     closeModal();
   };
@@ -688,7 +737,14 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
                 <div style={{ fontSize: 18, fontWeight: 700 }}>{detail.sirket_adi}</div>
                 <div style={{ fontSize: 13, color: "var(--text-mute)", marginTop: 2 }}>{detail.sahip_adi}</div>
               </div>
-              <button className="modal__close" onClick={() => setDetail(null)}>✕</button>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <button onClick={() => { setLogsOpen(false); setLogs([]); fetchLogs(detail.id); }}
+                  style={{ background: "rgba(59,130,246,0.1)", border: "1px solid #3b82f633", borderRadius: 6, padding: "4px 10px", cursor: "pointer", color: "#60a5fa", fontSize: 12, display: "flex", alignItems: "center", gap: 5 }}>
+                  <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                  Geçmiş
+                </button>
+                <button className="modal__close" onClick={() => { setDetail(null); setLogsOpen(false); setLogs([]); }}>✕</button>
+              </div>
             </div>
             <div className="modal__body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {detail.telefon && <DetailRow label="Telefon" value={detail.telefon} color="#fbbf24" />}
@@ -707,6 +763,48 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
                   style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "var(--accent)", fontSize: 13, textDecoration: "none", padding: "8px 0" }}>
                   <PdfIcon /> Sözleşmeyi Görüntüle
                 </a>
+              )}
+
+              {/* Activity log */}
+              {logsOpen && (
+                <div style={{ marginTop: 4, borderTop: "1px solid var(--border)", paddingTop: 12 }}>
+                  <div style={{ fontSize: 12, color: "var(--text-mute)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>Aktivite Geçmişi</div>
+                  {logsLoading ? (
+                    <div style={{ color: "var(--text-mute)", fontSize: 13 }}>Yükleniyor...</div>
+                  ) : logs.length === 0 ? (
+                    <div style={{ color: "var(--text-mute)", fontSize: 13 }}>Henüz kayıt yok.</div>
+                  ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      {logs.map(log => (
+                        <div key={log.id} style={{ padding: "8px 10px", borderRadius: 7, background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", fontSize: 12 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                            <span style={{ color: log.action === "olusturuldu" ? "#4ade80" : "#60a5fa", fontWeight: 600 }}>
+                              {log.action === "olusturuldu" ? "✦ Oluşturuldu" : "✎ Güncellendi"}
+                            </span>
+                            <span style={{ color: "var(--text-mute)", fontFamily: "var(--font-mono)" }}>
+                              {new Date(log.created_at).toLocaleString("tr-TR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                            </span>
+                          </div>
+                          <div style={{ color: "var(--text-dim)", marginBottom: 3 }}>
+                            <span style={{ color: "var(--text-mute)" }}>Kullanıcı: </span>{log.user_name}
+                          </div>
+                          {log.action === "guncellendi" && log.changes && (
+                            <div style={{ display: "flex", flexDirection: "column", gap: 3, marginTop: 4 }}>
+                              {Object.entries(log.changes as Record<string, { eski: any; yeni: any }>).map(([alan, { eski, yeni }]) => (
+                                <div key={alan} style={{ display: "flex", gap: 6, alignItems: "flex-start" }}>
+                                  <span style={{ color: "var(--text-mute)", minWidth: 90 }}>{alan}:</span>
+                                  <span style={{ color: "#f87171", textDecoration: "line-through" }}>{String(eski)}</span>
+                                  <span style={{ color: "var(--text-mute)" }}>→</span>
+                                  <span style={{ color: "#4ade80" }}>{String(yeni)}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           </div>
