@@ -96,6 +96,8 @@ interface Contact {
   alinan_para_birimi?: string;
   anlasilan_ucret?: number;
   anlasilan_para_birimi?: string;
+  kalan_ucret?: number;
+  kalan_para_birimi?: string;
   iletisim_tarihi?: string;
   sonuc?: string;
   yapilan_isler?: string;
@@ -107,7 +109,7 @@ type SonucType = "Beklemede" | "Olumlu" | "Olumsuz" | "Devam Ediyor";
 const EMPTY_FORM = {
   sirket_adi: "", sahip_adi: "", telefon: "+90 ", email: "",
   website_url: "", google_maps_url: "", not_kismi: "",
-  alinan_ucret: "", alinan_para_birimi: "₺", anlasilan_ucret: "", anlasilan_para_birimi: "₺", iletisim_tarihi: "",
+  alinan_ucret: "", alinan_para_birimi: "₺", anlasilan_ucret: "", anlasilan_para_birimi: "₺", kalan_ucret: "", kalan_para_birimi: "₺", iletisim_tarihi: "",
   sonuc: "Beklemede" as SonucType, yapilan_isler: "", sozlesme_url: "",
 };
 
@@ -251,6 +253,8 @@ function ContactModal({
     alinan_para_birimi: contact?.alinan_para_birimi ?? "₺",
     anlasilan_ucret: contact?.anlasilan_ucret != null ? contact.anlasilan_ucret.toLocaleString("tr-TR") : "",
     anlasilan_para_birimi: contact?.anlasilan_para_birimi ?? "₺",
+    kalan_ucret: contact?.kalan_ucret != null ? contact.kalan_ucret.toLocaleString("tr-TR") : "",
+    kalan_para_birimi: contact?.kalan_para_birimi ?? "₺",
     iletisim_tarihi: contact?.iletisim_tarihi ?? new Date().toISOString().split("T")[0],
     sonuc: (contact?.sonuc ?? "Beklemede") as SonucType,
     yapilan_isler: contact?.yapilan_isler ?? "",
@@ -267,6 +271,7 @@ function ContactModal({
       ...form,
       alinan_ucret: form.alinan_ucret ? parseFloat(form.alinan_ucret.replace(/\./g, "").replace(",", ".")) : null,
       anlasilan_ucret: form.anlasilan_ucret ? parseFloat(form.anlasilan_ucret.replace(/\./g, "").replace(",", ".")) : null,
+      kalan_ucret: form.kalan_ucret ? parseFloat(form.kalan_ucret.replace(/\./g, "").replace(",", ".")) : null,
       iletisim_tarihi: form.iletisim_tarihi || null,
     }, file ?? undefined);
     setSaving(false);
@@ -348,6 +353,23 @@ function ContactModal({
                         placeholder="0" style={{ borderColor: "#f8717133", color: "#f87171" }} />
                       <select value={form.anlasilan_para_birimi} onChange={e => set("anlasilan_para_birimi", e.target.value)}
                         style={{ width: 72, flexShrink: 0, borderColor: "#f8717133", color: "#f87171", fontWeight: 600 }}>
+                        <option>₺</option><option>$</option><option>€</option><option>£</option>
+                      </select>
+                    </div>
+                  </label>
+                  <label className="field" style={{ gridColumn: "1 / -1" }}>
+                    <span className="field__lbl" style={{ color: "#a78bfa" }}>Kalan Ücret</span>
+                    <div style={{ display: "flex", gap: 6 }}>
+                      <input type="text" inputMode="numeric" value={form.kalan_ucret}
+                        onChange={e => {
+                          const raw = e.target.value.replace(/\./g, "").replace(/[^0-9,]/g, "");
+                          const parts = raw.split(",");
+                          parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                          set("kalan_ucret", parts.join(","));
+                        }}
+                        placeholder="0" style={{ borderColor: "#a78bfa33", color: "#a78bfa" }} />
+                      <select value={form.kalan_para_birimi} onChange={e => set("kalan_para_birimi", e.target.value)}
+                        style={{ width: 72, flexShrink: 0, borderColor: "#a78bfa33", color: "#a78bfa", fontWeight: 600 }}>
                         <option>₺</option><option>$</option><option>€</option><option>£</option>
                       </select>
                     </div>
@@ -628,12 +650,7 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
                     </td>
                     <td className="mono dim">{fmtDate(c.iletisim_tarihi)}</td>
                     <td className="mono" style={{ color: c.alinan_ucret != null ? "#4ade80" : undefined }}>{fmt(c.alinan_ucret, c.alinan_para_birimi)}</td>
-                    <td className="mono">{(() => {
-                      if (c.anlasilan_ucret == null) return <span style={{ color: "var(--text-mute)" }}>—</span>;
-                      const kalan = c.anlasilan_ucret - (c.alinan_ucret ?? 0);
-                      const color = kalan > 0 ? "#f87171" : kalan < 0 ? "#4ade80" : "var(--text-mute)";
-                      return <span style={{ color }}>{fmt(kalan, c.anlasilan_para_birimi)}</span>;
-                    })()}</td>
+                    <td className="mono" style={{ color: c.kalan_ucret != null ? "#a78bfa" : undefined }}>{fmt(c.kalan_ucret, c.kalan_para_birimi)}</td>
                     <td>
                       <span className={badgeClass(c.sonuc)}>{c.sonuc ?? "Beklemede"}</span>
                     </td>
@@ -682,6 +699,7 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
               {detail.sonuc && <DetailRow label="Sonuç" value={detail.sonuc} badge />}
               {(detail.alinan_ucret != null) && <DetailRow label="Alınan Ücret" value={fmt(detail.alinan_ucret, detail.alinan_para_birimi)} color="#4ade80" />}
               {(detail.anlasilan_ucret != null) && <DetailRow label="Anlaşılan Ücret" value={fmt(detail.anlasilan_ucret, detail.anlasilan_para_birimi)} color="#f87171" />}
+              {(detail.kalan_ucret != null) && <DetailRow label="Kalan Ücret" value={fmt(detail.kalan_ucret, detail.kalan_para_birimi)} color="#a78bfa" />}
               {detail.not_kismi && <DetailRow label="Not" value={detail.not_kismi} multiline />}
               {detail.yapilan_isler && <DetailRow label="Yapılan İşler" value={detail.yapilan_isler} multiline />}
               {detail.sozlesme_url && (
