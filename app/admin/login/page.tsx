@@ -59,8 +59,8 @@ export default function LoginPage() {
         .select("must_change_password")
         .eq("id", data.user.id)
         .single();
-      // Profil yoksa veya must_change_password true ise şifre belirleme sayfasına yönlendir
-      if (!profile || profile.must_change_password) {
+      // Sadece must_change_password true ise şifre belirleme sayfasına yönlendir
+      if (profile?.must_change_password) {
         router.push("/admin/change-password");
         return;
       }
