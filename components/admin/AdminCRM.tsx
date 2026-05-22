@@ -88,6 +88,9 @@ interface Contact {
   sirket_adi: string;
   sahip_adi: string;
   telefon?: string;
+  email?: string;
+  website_url?: string;
+  google_maps_url?: string;
   not_kismi?: string;
   alinan_ucret?: number;
   anlasilan_ucret?: number;
@@ -100,7 +103,8 @@ interface Contact {
 type SonucType = "Beklemede" | "Olumlu" | "Olumsuz" | "Devam Ediyor";
 
 const EMPTY_FORM = {
-  sirket_adi: "", sahip_adi: "", telefon: "", not_kismi: "",
+  sirket_adi: "", sahip_adi: "", telefon: "", email: "",
+  website_url: "", google_maps_url: "", not_kismi: "",
   alinan_ucret: "", anlasilan_ucret: "", iletisim_tarihi: "",
   sonuc: "Beklemede" as SonucType, yapilan_isler: "", sozlesme_url: "",
 };
@@ -181,6 +185,9 @@ function ContactModal({
     sirket_adi: contact?.sirket_adi ?? "",
     sahip_adi: contact?.sahip_adi ?? "",
     telefon: contact?.telefon ?? "",
+    email: contact?.email ?? "",
+    website_url: contact?.website_url ?? "",
+    google_maps_url: contact?.google_maps_url ?? "",
     not_kismi: contact?.not_kismi ?? "",
     alinan_ucret: contact?.alinan_ucret != null ? String(contact.alinan_ucret) : "",
     anlasilan_ucret: contact?.anlasilan_ucret != null ? String(contact.anlasilan_ucret) : "",
@@ -225,8 +232,17 @@ function ContactModal({
               <FormField label="Telefon" optional>
                 <input value={form.telefon} onChange={e => set("telefon", e.target.value)} placeholder="+90 5__ ___ __ __" />
               </FormField>
+              <FormField label="E-posta" optional>
+                <input type="email" value={form.email} onChange={e => set("email", e.target.value)} placeholder="ornek@firma.com" />
+              </FormField>
               <FormField label="İletişim Tarihi" optional>
                 <input type="date" value={form.iletisim_tarihi} onChange={e => set("iletisim_tarihi", e.target.value)} />
+              </FormField>
+              <FormField label="Web Sitesi" optional>
+                <input value={form.website_url} onChange={e => set("website_url", e.target.value)} placeholder="https://firma.com" />
+              </FormField>
+              <FormField label="Google Maps Linki" optional>
+                <input value={form.google_maps_url} onChange={e => set("google_maps_url", e.target.value)} placeholder="https://maps.google.com/..." />
               </FormField>
             </div>
 
@@ -391,9 +407,6 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
         </div>
       </div>
 
-      {/* Quick Links */}
-      <QuickLinks />
-
       {/* Main */}
       <main className="admin-main">
         <div className="admin-page-head">
@@ -447,6 +460,7 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
                   <th>Şirket Adı</th>
                   <th>Sahip</th>
                   <th>Telefon</th>
+                  <th>İletişim</th>
                   <th>Tarih</th>
                   <th>Alınan Ücret</th>
                   <th>Anlaşılan Ücret</th>
@@ -457,7 +471,7 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
               <tbody>
                 {filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={8}>
+                    <td colSpan={9}>
                       <div className="crm-empty">
                         <div className="crm-empty__icon">📋</div>
                         <div className="crm-empty__text">
@@ -471,6 +485,35 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
                     <td><strong>{c.sirket_adi}</strong></td>
                     <td className="dim">{c.sahip_adi}</td>
                     <td className="mono dim">{c.telefon || "—"}</td>
+                    <td>
+                      <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                        {c.google_maps_url && (
+                          <a href={c.google_maps_url} target="_blank" rel="noopener noreferrer" title="Google Maps" style={{ color: "#34d399", display: "flex" }}>
+                            <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 7-8 13-8 13s-8-6-8-13a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                          </a>
+                        )}
+                        {c.website_url && (
+                          <a href={c.website_url} target="_blank" rel="noopener noreferrer" title="Web Sitesi" style={{ color: "#60a5fa", display: "flex" }}>
+                            <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/></svg>
+                          </a>
+                        )}
+                        {c.email && (
+                          <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
+                            <a href={`mailto:${c.email}`} title={c.email} style={{ color: "#a78bfa", display: "flex" }}>
+                              <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+                            </a>
+                            <button
+                              onClick={() => { navigator.clipboard.writeText(c.email!); }}
+                              title="Kopyala"
+                              style={{ background: "none", border: "1px solid var(--border)", borderRadius: 4, padding: "1px 5px", cursor: "pointer", color: "var(--text-mute)", fontSize: 10, lineHeight: 1 }}
+                            >
+                              <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            </button>
+                          </div>
+                        )}
+                        {!c.google_maps_url && !c.website_url && !c.email && <span className="dim">—</span>}
+                      </div>
+                    </td>
                     <td className="mono dim">{fmtDate(c.iletisim_tarihi)}</td>
                     <td className="mono">{fmt(c.alinan_ucret)}</td>
                     <td className="mono">{fmt(c.anlasilan_ucret)}</td>
