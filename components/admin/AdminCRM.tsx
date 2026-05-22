@@ -261,7 +261,7 @@ function ContactModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.sirket_adi.trim() || !form.sahip_adi.trim()) return;
+    if (!form.sirket_adi.trim()) return;
     setSaving(true);
     await onSave({
       ...form,
@@ -287,7 +287,7 @@ function ContactModal({
                 <input value={form.sirket_adi} onChange={e => { set("sirket_adi", e.target.value); e.target.setCustomValidity(""); }} onInvalid={e => (e.target as HTMLInputElement).setCustomValidity("Şirket adı zorunludur")} required placeholder="Örn: ABC Teknoloji A.Ş." />
               </FormField>
               <FormField label="Sahip / Yetkili">
-                <input value={form.sahip_adi} onChange={e => { set("sahip_adi", e.target.value); e.target.setCustomValidity(""); }} onInvalid={e => (e.target as HTMLInputElement).setCustomValidity("Sahip / yetkili adı zorunludur")} required placeholder="Ad Soyad" />
+                <input value={form.sahip_adi} onChange={e => set("sahip_adi", e.target.value)} placeholder="Ad Soyad" />
               </FormField>
               <FormField label="Telefon">
                 <input value={form.telefon} onChange={e => set("telefon", e.target.value)} placeholder="+90 5__ ___ __ __" />
