@@ -459,7 +459,6 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
                 <tr>
                   <th>Şirket Adı</th>
                   <th>Sahip</th>
-                  <th>Telefon</th>
                   <th>İletişim</th>
                   <th>Tarih</th>
                   <th>Alınan Ücret</th>
@@ -471,7 +470,7 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
               <tbody>
                 {filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={9}>
+                    <td colSpan={8}>
                       <div className="crm-empty">
                         <div className="crm-empty__icon">📋</div>
                         <div className="crm-empty__text">
@@ -484,7 +483,6 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
                   <tr key={c.id}>
                     <td><strong>{c.sirket_adi}</strong></td>
                     <td className="dim">{c.sahip_adi}</td>
-                    <td className="mono dim">{c.telefon || "—"}</td>
                     <td>
                       <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                         {c.google_maps_url && (
