@@ -67,6 +67,15 @@ const Nav = ({ active, onJump }: { active: string; onJump: (id: string) => void 
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      const header = document.querySelector(".nav");
+      if (header && !header.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
   const jump = (id: string) => { setOpen(false); onJump(id); };
   return (
     <header className={`nav ${scrolled ? "nav--scrolled" : ""}`}>

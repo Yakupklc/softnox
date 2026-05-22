@@ -220,12 +220,13 @@ button { font-family: inherit; }
   cursor: pointer;
 }
 .nav__mobile {
-  position: absolute; top: var(--nav-h); left: 0; right: 0;
-  background: rgba(6, 9, 18, 0.95);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
+  position: fixed; top: var(--nav-h); left: 0; right: 0; bottom: 0;
+  background: rgba(4, 6, 14, 0.98);
+  backdrop-filter: blur(24px);
+  border-top: 1px solid var(--border);
   max-height: 0; overflow: hidden;
   transition: max-height 0.3s ease;
+  z-index: 49;
 }
 .nav__mobile.is-open { max-height: 600px; }
 .nav__mobile a {
@@ -239,7 +240,7 @@ button { font-family: inherit; }
 @media (max-width: 960px) {
   .nav__links { display: none; }
   .nav__burger { display: inline-flex; }
-  .nav__cta .btn { display: none; }
+  .nav__cta .btn { display: inline-flex; }
 }
 
 /* ===== Section base ===== */
