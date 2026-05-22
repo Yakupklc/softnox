@@ -283,12 +283,6 @@ function ContactModal({
 
             <p className="modal__section-title">Finansal Bilgiler</p>
             <div className="modal__grid">
-              <FormField label="Alınan Ücret (₺)" optional>
-                <input type="number" min="0" step="0.01" value={form.alinan_ucret} onChange={e => set("alinan_ucret", e.target.value)} placeholder="0.00" />
-              </FormField>
-              <FormField label="Anlaşılan Ücret (₺)" optional>
-                <input type="number" min="0" step="0.01" value={form.anlasilan_ucret} onChange={e => set("anlasilan_ucret", e.target.value)} placeholder="0.00" />
-              </FormField>
               <FormField label="Sonuç">
                 <select value={form.sonuc} onChange={e => set("sonuc", e.target.value)}>
                   <option>Beklemede</option>
@@ -297,6 +291,16 @@ function ContactModal({
                   <option>Devam Ediyor</option>
                 </select>
               </FormField>
+              {(form.sonuc === "Olumlu" || form.sonuc === "Devam Ediyor") && (
+                <>
+                  <FormField label="Alınan Ücret (₺)" optional>
+                    <input type="number" min="0" step="0.01" value={form.alinan_ucret} onChange={e => set("alinan_ucret", e.target.value)} placeholder="0.00" />
+                  </FormField>
+                  <FormField label="Anlaşılan Ücret (₺)" optional>
+                    <input type="number" min="0" step="0.01" value={form.anlasilan_ucret} onChange={e => set("anlasilan_ucret", e.target.value)} placeholder="0.00" />
+                  </FormField>
+                </>
+              )}
             </div>
 
             <p className="modal__section-title">Notlar & İşler</p>
