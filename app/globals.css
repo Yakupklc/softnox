@@ -29,7 +29,7 @@
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-html, body { margin: 0; padding: 0; }
+html, body { margin: 0; padding: 0; max-width: 100%; overflow-x: hidden; }
 body {
   font-family: var(--font-sans);
   background: var(--bg);
@@ -249,6 +249,7 @@ button { font-family: inherit; }
   min-height: 100vh;
   display: flex; flex-direction: column;
   justify-content: center;
+  max-width: 100%;
 }
 .hero__grid-bg {
   position: absolute; inset: 0;
@@ -276,6 +277,10 @@ button { font-family: inherit; }
   background: var(--accent-3);
   bottom: -250px; right: -150px;
   opacity: 0.25;
+}
+@media (max-width: 768px) {
+  .hero__glow--1 { width: 300px; height: 300px; left: -80px; }
+  .hero__glow--2 { width: 300px; height: 300px; right: -80px; }
 }
 
 .hero__inner {
@@ -1097,8 +1102,9 @@ button { font-family: inherit; }
 
 /* ===== Site Responsive ===== */
 @media (max-width: 768px) {
-  /* Container padding */
-  .container { padding: 0 20px; }
+  /* Global overflow fix */
+  *, *::before, *::after { max-width: 100%; }
+  .container { padding: 0 20px; overflow: hidden; }
 
   /* Section */
   .section { padding: 80px 0; }
@@ -1109,16 +1115,17 @@ button { font-family: inherit; }
   .nav { padding: 0 20px; }
 
   /* Hero */
-  .hero { padding: calc(var(--nav-h) + 40px) 0 60px; min-height: auto; }
+  .hero { padding: calc(var(--nav-h) + 40px) 0 60px; min-height: auto; overflow: hidden; }
   .hero__inner { grid-template-columns: 1fr; gap: 0; }
   .hero__right { display: none; }
   .hero__left { gap: 20px; align-items: flex-start; }
-  .hero__title { font-size: clamp(32px, 9vw, 52px); }
-  .hero__sub { font-size: 16px; }
+  .hero__title { font-size: clamp(28px, 8vw, 48px); word-break: break-word; }
+  .hero__sub { font-size: 15px; }
   .hero__cta { flex-direction: column; width: 100%; }
   .hero__cta .btn { width: 100%; justify-content: center; }
   .hero__trust { grid-template-columns: 1fr; gap: 8px; }
-  .hero__marquee { margin-top: 40px; }
+  .hero__marquee { margin-top: 40px; overflow: hidden; }
+  .marquee__track { animation-duration: 30s; }
 
   /* About */
   .about__grid { grid-template-columns: 1fr; gap: 32px; }
