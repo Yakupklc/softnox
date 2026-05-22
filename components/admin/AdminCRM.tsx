@@ -224,8 +224,8 @@ function ContactModal({
     website_url: contact?.website_url ?? "",
     google_maps_url: contact?.google_maps_url ?? "",
     not_kismi: contact?.not_kismi ?? "",
-    alinan_ucret: contact?.alinan_ucret != null ? String(contact.alinan_ucret) : "",
-    anlasilan_ucret: contact?.anlasilan_ucret != null ? String(contact.anlasilan_ucret) : "",
+    alinan_ucret: contact?.alinan_ucret != null ? contact.alinan_ucret.toLocaleString("tr-TR") : "",
+    anlasilan_ucret: contact?.anlasilan_ucret != null ? contact.anlasilan_ucret.toLocaleString("tr-TR") : "",
     iletisim_tarihi: contact?.iletisim_tarihi ?? new Date().toISOString().split("T")[0],
     sonuc: (contact?.sonuc ?? "Beklemede") as SonucType,
     yapilan_isler: contact?.yapilan_isler ?? "",
@@ -240,8 +240,8 @@ function ContactModal({
     setSaving(true);
     await onSave({
       ...form,
-      alinan_ucret: form.alinan_ucret ? parseFloat(form.alinan_ucret) : null,
-      anlasilan_ucret: form.anlasilan_ucret ? parseFloat(form.anlasilan_ucret) : null,
+      alinan_ucret: form.alinan_ucret ? parseFloat(form.alinan_ucret.replace(/\./g, "").replace(",", ".")) : null,
+      anlasilan_ucret: form.anlasilan_ucret ? parseFloat(form.anlasilan_ucret.replace(/\./g, "").replace(",", ".")) : null,
       iletisim_tarihi: form.iletisim_tarihi || null,
     }, file ?? undefined);
     setSaving(false);
@@ -295,13 +295,25 @@ function ContactModal({
                 <div style={{ gridColumn: "1 / -1", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                   <label className="field">
                     <span className="field__lbl" style={{ color: "#4ade80" }}>Alınan Ücret (₺)</span>
-                    <input type="number" min="0" step="0.01" value={form.alinan_ucret} onChange={e => set("alinan_ucret", e.target.value)} placeholder="0.00"
-                      style={{ borderColor: "#4ade8033", color: "#4ade80" }} />
+                    <input type="text" inputMode="numeric" value={form.alinan_ucret}
+                      onChange={e => {
+                        const raw = e.target.value.replace(/\./g, "").replace(/[^0-9,]/g, "");
+                        const parts = raw.split(",");
+                        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                        set("alinan_ucret", parts.join(","));
+                      }}
+                      placeholder="0" style={{ borderColor: "#4ade8033", color: "#4ade80" }} />
                   </label>
                   <label className="field">
                     <span className="field__lbl" style={{ color: "#f87171" }}>Anlaşılan Ücret (₺)</span>
-                    <input type="number" min="0" step="0.01" value={form.anlasilan_ucret} onChange={e => set("anlasilan_ucret", e.target.value)} placeholder="0.00"
-                      style={{ borderColor: "#f8717133", color: "#f87171" }} />
+                    <input type="text" inputMode="numeric" value={form.anlasilan_ucret}
+                      onChange={e => {
+                        const raw = e.target.value.replace(/\./g, "").replace(/[^0-9,]/g, "");
+                        const parts = raw.split(",");
+                        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                        set("anlasilan_ucret", parts.join(","));
+                      }}
+                      placeholder="0" style={{ borderColor: "#f8717133", color: "#f87171" }} />
                   </label>
                 </div>
               )}
