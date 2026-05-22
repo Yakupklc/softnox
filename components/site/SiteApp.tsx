@@ -102,44 +102,43 @@ const Nav = ({ active, onJump }: { active: string; onJump: (id: string) => void 
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e: MouseEvent) => {
-      const header = document.querySelector(".nav");
-      if (header && !header.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [open]);
   const jump = (id: string) => { setOpen(false); onJump(id); };
   return (
-    <header className={`nav ${scrolled ? "nav--scrolled" : ""}`}>
-      <div className="nav__inner">
-        <a href="#anasayfa" onClick={(e) => { e.preventDefault(); jump("anasayfa"); }}><Logo /></a>
-        <nav className="nav__links">
-          {NAV_ITEMS.map(it => (
-            <a key={it.id} href={`#${it.id}`}
-               onClick={(e) => { e.preventDefault(); jump(it.id); }}
-               className={active === it.id ? "is-active" : ""}>{it.label}</a>
-          ))}
-        </nav>
-        <div className="nav__cta">
-          <button className="btn btn--primary btn--sm" onClick={() => jump("iletisim")}>
-            Teklif Al <ArrowRight size={14} />
-          </button>
-          <button className="nav__burger" onClick={() => setOpen(o => !o)} aria-label="Menü">
-            {open ? <Close /> : <Menu />}
-          </button>
+    <>
+      {open && (
+        <div
+          onClick={() => setOpen(false)}
+          style={{ position: "fixed", inset: 0, zIndex: 47 }}
+        />
+      )}
+      <header className={`nav ${scrolled ? "nav--scrolled" : ""}`}>
+        <div className="nav__inner">
+          <a href="#anasayfa" onClick={(e) => { e.preventDefault(); jump("anasayfa"); }}><Logo /></a>
+          <nav className="nav__links">
+            {NAV_ITEMS.map(it => (
+              <a key={it.id} href={`#${it.id}`}
+                 onClick={(e) => { e.preventDefault(); jump(it.id); }}
+                 className={active === it.id ? "is-active" : ""}>{it.label}</a>
+            ))}
+          </nav>
+          <div className="nav__cta">
+            <button className="btn btn--primary btn--sm" onClick={() => jump("iletisim")}>
+              Teklif Al <ArrowRight size={14} />
+            </button>
+            <button className="nav__burger" onClick={() => setOpen(o => !o)} aria-label="Menü">
+              {open ? <Close /> : <Menu />}
+            </button>
+          </div>
         </div>
-      </div>
-      <div className={`nav__mobile ${open ? "is-open" : ""}`}>
-        {NAV_ITEMS.map(it => (
-          <a key={it.id} href={`#${it.id}`} onClick={(e) => { e.preventDefault(); jump(it.id); }}>
-            <span>{it.label}</span><ArrowRight size={16} />
-          </a>
-        ))}
-      </div>
-    </header>
+        <div className={`nav__mobile ${open ? "is-open" : ""}`}>
+          {NAV_ITEMS.map(it => (
+            <a key={it.id} href={`#${it.id}`} onClick={(e) => { e.preventDefault(); jump(it.id); }}>
+              <span>{it.label}</span><ArrowRight size={16} />
+            </a>
+          ))}
+        </div>
+      </header>
+    </>
   );
 };
 
