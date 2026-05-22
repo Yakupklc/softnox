@@ -1527,3 +1527,95 @@ button { font-family: inherit; }
     transition-duration: 0.001s !important;
   }
 }
+
+/* ===== Admin Responsive ===== */
+@media (max-width: 768px) {
+  /* Topbar */
+  .admin-topbar {
+    padding: 0 16px;
+    gap: 10px;
+    height: 56px;
+  }
+  .admin-topbar .logo-text { display: none; }
+  .admin-topbar__info { display: none; }
+  .admin-topbar__right { gap: 8px; }
+  .admin-topbar__logout span { display: none; }
+  .admin-topbar__logout { padding: 7px 10px; }
+
+  /* Main */
+  .admin-main { padding: 20px 16px; }
+
+  /* Page head */
+  .admin-page-head { flex-direction: column; align-items: stretch; gap: 12px; }
+  .admin-page-head .btn { width: 100%; justify-content: center; }
+  .admin-page-title { font-size: 20px; }
+
+  /* Stats */
+  .crm-stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .crm-stat { padding: 14px 16px; }
+  .crm-stat__val { font-size: 22px; }
+
+  /* Table toolbar */
+  .crm-table-toolbar { flex-direction: column; align-items: stretch; }
+  .crm-search { min-width: unset; width: 100%; }
+
+  /* Modal */
+  .modal-overlay { padding: 0; align-items: flex-end; }
+  .modal {
+    max-width: 100%;
+    max-height: 95vh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+  .modal__head { padding: 18px 20px; }
+  .modal__body { padding: 20px; gap: 14px; }
+  .modal__foot { padding: 16px 20px; }
+  .modal__grid { grid-template-columns: 1fr; }
+
+  /* Login card */
+  .admin-login__card {
+    padding: 32px 24px;
+    margin: 16px;
+    width: calc(100% - 32px);
+  }
+
+  /* Welcome */
+  .welcome__name { font-size: clamp(28px, 8vw, 56px); }
+  .welcome__greeting { font-size: 14px; }
+  .welcome__title { font-size: 14px; }
+}
+
+@media (max-width: 480px) {
+  /* Stats 2x2 → full width on very small */
+  .crm-stats { grid-template-columns: repeat(2, 1fr); }
+
+  /* Topbar butonlar küçük */
+  .admin-topbar__avatar { width: 28px; height: 28px; font-size: 10px; }
+
+  /* Settings butonlar dikey */
+  .admin-topbar__right { gap: 6px; }
+  .admin-topbar__right button { font-size: 11px; padding: 4px 8px; }
+}
+
+/* Şifre görünürlük toggle için input sarmalayıcı */
+.password-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.password-wrap input {
+  width: 100%;
+  padding-right: 44px;
+}
+.password-wrap__toggle {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: var(--text-mute);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+.password-wrap__toggle:hover { color: var(--text-dim); }
