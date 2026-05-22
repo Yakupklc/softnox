@@ -226,14 +226,12 @@ button { font-family: inherit; }
   -webkit-tap-highlight-color: transparent;
 }
 .nav__mobile {
-  display: none;
   position: fixed; top: var(--nav-h); left: 0; right: 0; bottom: 0;
   background: rgb(4, 6, 14);
   border-top: 1px solid var(--border);
   z-index: 48;
   overflow-y: auto;
 }
-.nav__mobile.is-open { display: block; }
 .nav__mobile a {
   display: flex; align-items: center; justify-content: space-between;
   padding: 14px 24px;

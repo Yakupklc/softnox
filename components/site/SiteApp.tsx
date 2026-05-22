@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 
 /* ===== Icon components ===== */
 const Icon = ({ d, size = 20, stroke = 1.5 }: { d: React.ReactNode; size?: number; stroke?: number }) => (
@@ -96,49 +96,64 @@ function SitePhoneContact() {
 const Nav = ({ active, onJump }: { active: string; onJump: (id: string) => void }) => {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    const timer = setTimeout(() => {
+      const handler = (e: MouseEvent | TouchEvent) => {
+        if (navRef.current && !navRef.current.contains(e.target as Node)) {
+          setOpen(false);
+        }
+      };
+      document.addEventListener("click", handler);
+      document.addEventListener("touchstart", handler as EventListener);
+      return () => {
+        document.removeEventListener("click", handler);
+        document.removeEventListener("touchstart", handler as EventListener);
+      };
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [open]);
+
   const jump = (id: string) => { setOpen(false); onJump(id); };
   return (
-    <>
-      {open && (
-        <div
-          onClick={() => setOpen(false)}
-          style={{ position: "fixed", inset: 0, zIndex: 47 }}
-        />
-      )}
-      <header className={`nav ${scrolled ? "nav--scrolled" : ""}`}>
-        <div className="nav__inner">
-          <a href="#anasayfa" onClick={(e) => { e.preventDefault(); jump("anasayfa"); }}><Logo /></a>
-          <nav className="nav__links">
-            {NAV_ITEMS.map(it => (
-              <a key={it.id} href={`#${it.id}`}
-                 onClick={(e) => { e.preventDefault(); jump(it.id); }}
-                 className={active === it.id ? "is-active" : ""}>{it.label}</a>
-            ))}
-          </nav>
-          <div className="nav__cta">
-            <button className="btn btn--primary btn--sm" onClick={() => jump("iletisim")}>
-              Teklif Al <ArrowRight size={14} />
-            </button>
-            <button className="nav__burger" onClick={() => setOpen(o => !o)} aria-label="Menü">
-              {open ? <Close /> : <Menu />}
-            </button>
-          </div>
+    <header ref={navRef} className={`nav ${scrolled ? "nav--scrolled" : ""}`}>
+      <div className="nav__inner">
+        <a href="#anasayfa" onClick={(e) => { e.preventDefault(); jump("anasayfa"); }}><Logo /></a>
+        <nav className="nav__links">
+          {NAV_ITEMS.map(it => (
+            <a key={it.id} href={`#${it.id}`}
+               onClick={(e) => { e.preventDefault(); jump(it.id); }}
+               className={active === it.id ? "is-active" : ""}>{it.label}</a>
+          ))}
+        </nav>
+        <div className="nav__cta">
+          <button className="btn btn--primary btn--sm" onClick={() => jump("iletisim")}>
+            Teklif Al <ArrowRight size={14} />
+          </button>
+          <button className="nav__burger" onClick={() => setOpen(o => !o)} aria-label="Menü">
+            {open ? <Close /> : <Menu />}
+          </button>
         </div>
-        <div className={`nav__mobile ${open ? "is-open" : ""}`}>
+      </div>
+      {open && (
+        <div className="nav__mobile">
           {NAV_ITEMS.map(it => (
             <a key={it.id} href={`#${it.id}`} onClick={(e) => { e.preventDefault(); jump(it.id); }}>
               <span>{it.label}</span><ArrowRight size={16} />
             </a>
           ))}
         </div>
-      </header>
-    </>
+      )}
+    </header>
   );
 };
 
