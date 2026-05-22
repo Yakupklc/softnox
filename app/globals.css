@@ -229,7 +229,7 @@ button { font-family: inherit; }
   position: fixed; top: var(--nav-h); left: 0; right: 0; bottom: 0;
   background: rgb(4, 6, 14);
   border-top: 1px solid var(--border);
-  z-index: 48;
+  z-index: 200;
   overflow-y: auto;
 }
 .nav__mobile a {

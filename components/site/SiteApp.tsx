@@ -125,25 +125,27 @@ const Nav = ({ active, onJump }: { active: string; onJump: (id: string) => void 
 
   const jump = (id: string) => { setOpen(false); onJump(id); };
   return (
-    <header ref={navRef} className={`nav ${scrolled ? "nav--scrolled" : ""}`}>
-      <div className="nav__inner">
-        <a href="#anasayfa" onClick={(e) => { e.preventDefault(); jump("anasayfa"); }}><Logo /></a>
-        <nav className="nav__links">
-          {NAV_ITEMS.map(it => (
-            <a key={it.id} href={`#${it.id}`}
-               onClick={(e) => { e.preventDefault(); jump(it.id); }}
-               className={active === it.id ? "is-active" : ""}>{it.label}</a>
-          ))}
-        </nav>
-        <div className="nav__cta">
-          <button className="btn btn--primary btn--sm" onClick={() => jump("iletisim")}>
-            Teklif Al <ArrowRight size={14} />
-          </button>
-          <button className="nav__burger" onClick={() => setOpen(o => !o)} aria-label="Menü">
-            {open ? <Close /> : <Menu />}
-          </button>
+    <>
+      <header ref={navRef} className={`nav ${scrolled ? "nav--scrolled" : ""}`}>
+        <div className="nav__inner">
+          <a href="#anasayfa" onClick={(e) => { e.preventDefault(); jump("anasayfa"); }}><Logo /></a>
+          <nav className="nav__links">
+            {NAV_ITEMS.map(it => (
+              <a key={it.id} href={`#${it.id}`}
+                 onClick={(e) => { e.preventDefault(); jump(it.id); }}
+                 className={active === it.id ? "is-active" : ""}>{it.label}</a>
+            ))}
+          </nav>
+          <div className="nav__cta">
+            <button className="btn btn--primary btn--sm" onClick={() => jump("iletisim")}>
+              Teklif Al <ArrowRight size={14} />
+            </button>
+            <button className="nav__burger" onClick={() => setOpen(o => !o)} aria-label="Menü">
+              {open ? <Close /> : <Menu />}
+            </button>
+          </div>
         </div>
-      </div>
+      </header>
       {open && (
         <div className="nav__mobile">
           {NAV_ITEMS.map(it => (
@@ -153,7 +155,7 @@ const Nav = ({ active, onJump }: { active: string; onJump: (id: string) => void 
           ))}
         </div>
       )}
-    </header>
+    </>
   );
 };
 
