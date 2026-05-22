@@ -343,25 +343,36 @@ function ContactModal({
               <textarea rows={3} value={form.yapilan_isler} onChange={e => set("yapilan_isler", e.target.value)} placeholder="Gerçekleştirilen işler, görüşmeler..." />
             </FormField>
 
-            <p className="modal__section-title">Sözleşme</p>
-            <div className="file-field">
-              <span className="file-field__label">Sözleşme PDF{" "}<em style={{ fontSize: 11, color: "var(--text-mute)" }}>(opsiyonel)</em></span>
-              <input
-                type="file"
-                accept=".pdf,application/pdf"
-                className="file-field__input"
-                onChange={e => setFile(e.target.files?.[0] ?? null)}
-              />
-              {contact?.sozlesme_url && !file && (
-                <div className="file-field__current">
-                  <PdfIcon /> Mevcut sözleşme yüklü —{" "}
-                  <a href={contact.sozlesme_url} target="_blank" rel="noopener noreferrer" style={{ color: "var(--accent-2)" }}>
-                    Görüntüle
-                  </a>
+            {(form.sonuc === "Olumlu" || form.sonuc === "Devam Ediyor") && (
+              <>
+                <p className="modal__section-title">Sözleşme</p>
+                <div className="file-field">
+                  <span className="file-field__label">Sözleşme PDF</span>
+                  <label style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}>
+                    <span style={{
+                      padding: "8px 16px", borderRadius: 8, border: "1px solid var(--border)",
+                      background: "rgba(59,130,246,0.1)", color: "var(--accent)", fontSize: 13, fontWeight: 500,
+                      whiteSpace: "nowrap", flexShrink: 0,
+                    }}>
+                      Dosya Seç
+                    </span>
+                    <span style={{ color: file ? "var(--text-base)" : "var(--text-mute)", fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {file ? file.name : "Dosya seçilmedi"}
+                    </span>
+                    <input type="file" accept=".pdf,application/pdf" style={{ display: "none" }}
+                      onChange={e => setFile(e.target.files?.[0] ?? null)} />
+                  </label>
+                  {contact?.sozlesme_url && !file && (
+                    <div className="file-field__current">
+                      <PdfIcon /> Mevcut sözleşme yüklü —{" "}
+                      <a href={contact.sozlesme_url} target="_blank" rel="noopener noreferrer" style={{ color: "var(--accent-2)" }}>
+                        Görüntüle
+                      </a>
+                    </div>
+                  )}
                 </div>
-              )}
-              {file && <div className="file-field__current"><PdfIcon /> {file.name}</div>}
-            </div>
+              </>
+            )}
           </div>
 
           <div className="modal__foot">
