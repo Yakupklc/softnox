@@ -20,6 +20,11 @@ export const metadata: Metadata = {
     "Softnox; kurumsal yazılım, web ve mobil uygulama, özel otomasyon ve dijital dönüşüm çözümleri sunan teknoloji odaklı bir yazılım şirketi.",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
