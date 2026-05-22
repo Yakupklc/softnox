@@ -1144,7 +1144,8 @@ button { font-family: inherit; }
   .section__desc { font-size: 15px; }
 
   /* Nav */
-  .nav { padding: 0 20px; }
+  .nav { padding: 0; }
+  .nav__inner { padding: 0 16px; max-width: 100%; width: 100%; box-sizing: border-box; }
 
   /* Hero */
   .hero { padding: calc(var(--nav-h) + 40px) 0 60px; min-height: auto; overflow: hidden; }
