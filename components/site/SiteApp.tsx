@@ -639,6 +639,47 @@ const SectionHead = ({ kicker, title, desc }: { kicker: string; title: React.Rea
 );
 
 /* ===== App ===== */
+function ScrollToTop() {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 400);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return (
+    <button
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      aria-label="En üste çık"
+      style={{
+        position: "fixed",
+        bottom: 28,
+        right: 24,
+        zIndex: 999,
+        width: 44,
+        height: 44,
+        borderRadius: 12,
+        background: "linear-gradient(135deg, rgba(34,211,238,0.2), rgba(59,130,246,0.2))",
+        border: "1px solid rgba(59,130,246,0.4)",
+        color: "#22d3ee",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "pointer",
+        backdropFilter: "blur(12px)",
+        boxShadow: "0 8px 32px rgba(59,130,246,0.25)",
+        transition: "opacity 0.3s, transform 0.3s",
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(16px)",
+        pointerEvents: visible ? "auto" : "none",
+      }}
+    >
+      <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 19V5"/><path d="m5 12 7-7 7 7"/>
+      </svg>
+    </button>
+  );
+}
+
 export default function SiteApp() {
   const [active, setActive] = useState("anasayfa");
   const jump = (id: string) => {
@@ -670,6 +711,7 @@ export default function SiteApp() {
         <Contact />
       </main>
       <Footer onJump={jump} />
+      <ScrollToTop />
     </>
   );
 }
