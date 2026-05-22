@@ -39,7 +39,12 @@ export default function ChangePasswordPage() {
 
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-      await supabase.from("profiles").update({ must_change_password: false }).eq("id", user.id);
+      await supabase.from("profiles").upsert({
+        id: user.id,
+        must_change_password: false,
+        role: "admin",
+        full_name: user.email?.split("@")[0] ?? "",
+      }, { onConflict: "id" });
     }
 
     setLoading(false);
