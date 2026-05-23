@@ -29,6 +29,7 @@ export function CRMDashboard({ initialContacts, userName }: CRMDashboardProps) {
 
   const [contacts, setContacts] = useState<Contact[]>(initialContacts);
   const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selected, setSelected] = useState<Contact | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
@@ -48,14 +49,17 @@ export function CRMDashboard({ initialContacts, userName }: CRMDashboardProps) {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return contacts;
-    return contacts.filter(c =>
-      c.sirket_adi.toLowerCase().includes(q) ||
-      (c.sahip_adi?.toLowerCase().includes(q) ?? false) ||
-      (c.telefon?.toLowerCase().includes(q) ?? false) ||
-      (c.email?.toLowerCase().includes(q) ?? false)
-    );
-  }, [contacts, query]);
+    return contacts.filter(c => {
+      if (statusFilter !== "all" && (c.sonuc ?? "Beklemede") !== statusFilter) return false;
+      if (!q) return true;
+      return (
+        c.sirket_adi.toLowerCase().includes(q) ||
+        (c.sahip_adi?.toLowerCase().includes(q) ?? false) ||
+        (c.telefon?.toLowerCase().includes(q) ?? false) ||
+        (c.email?.toLowerCase().includes(q) ?? false)
+      );
+    });
+  }, [contacts, query, statusFilter]);
 
   const refresh = useCallback(async () => {
     const { data, error } = await supabase
@@ -120,14 +124,39 @@ export function CRMDashboard({ initialContacts, userName }: CRMDashboardProps) {
         <StatCard label="Beklemede" value={stats.bekleme} icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>} tone="warning" />
       </div>
 
-      <div className="ui-search-bar">
-        <span className="ui-search-bar__icon"><SearchIcon /></span>
-        <Input
-          aria-label="Müşteri ara"
-          placeholder="Şirket adı, sahip veya telefon ara…"
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-        />
+      <div className="ui-filter-row">
+        <div className="ui-search-bar">
+          <span className="ui-search-bar__icon"><SearchIcon /></span>
+          <Input
+            aria-label="Müşteri ara"
+            placeholder="Şirket adı, sahip veya telefon ara…"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+          />
+        </div>
+        <div className="ui-filter-chips" role="group" aria-label="Duruma göre filtrele">
+          {[
+            { v: "all",          label: "Hepsi",        count: contacts.length },
+            { v: "Beklemede",    label: "Beklemede",    count: stats.bekleme },
+            { v: "Olumlu",       label: "Olumlu",       count: stats.olumlu },
+            { v: "Devam Ediyor", label: "Devam Ediyor", count: stats.devam },
+            { v: "Olumsuz",      label: "Olumsuz",      count: contacts.filter(c => c.sonuc === "Olumsuz").length },
+          ].map(opt => {
+            const active = statusFilter === opt.v;
+            return (
+              <button
+                key={opt.v}
+                type="button"
+                className={"ui-chip" + (active ? " ui-chip--active" : "")}
+                aria-pressed={active}
+                onClick={() => setStatusFilter(opt.v)}
+              >
+                {opt.label}
+                <span className="ui-chip__count">{opt.count}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <DataTable<Contact>
