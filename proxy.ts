@@ -31,7 +31,7 @@ export async function proxy(request: NextRequest) {
   }
 
   if (pathname === "/admin/login" && user) {
-    return NextResponse.redirect(new URL("/admin/welcome", request.url));
+    return NextResponse.redirect(new URL("/admin", request.url));
   }
 
   return supabaseResponse;
