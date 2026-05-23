@@ -808,7 +808,7 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
       {/* Detail Card */}
       {detail && (
         <div className="modal-overlay" onClick={() => setDetail(null)}>
-          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 480 }}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: logsOpen ? 820 : 480, transition: "max-width 0.25s ease" }}>
             <div className="modal__head">
               <div>
                 <div style={{ fontSize: 18, fontWeight: 700 }}>{detail.sirket_adi}</div>
@@ -831,64 +831,63 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
                 <button className="modal__close" onClick={() => { setDetail(null); setLogsOpen(false); setLogs([]); }}>✕</button>
               </div>
             </div>
-            <div className="modal__body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {detail.telefon && <DetailRow label="Telefon" value={detail.telefon} color="#fbbf24" />}
-              {detail.email && <DetailRow label="E-posta" value={detail.email} color="#a78bfa" />}
-              {detail.website_url && <DetailRow label="Web Sitesi" value={detail.website_url} color="#60a5fa" />}
-              {detail.google_maps_url && <DetailRow label="Google Maps" value="Haritada Gör" href={detail.google_maps_url} color="#34d399" />}
-              {detail.iletisim_tarihi && <DetailRow label="İletişim Tarihi" value={fmtDate(detail.iletisim_tarihi)} />}
-              {detail.sonuc && <DetailRow label="Sonuç" value={detail.sonuc} badge />}
-              {(detail.alinan_ucret != null) && <DetailRow label="Alınan Ücret" value={fmt(detail.alinan_ucret, detail.alinan_para_birimi)} color="#4ade80" />}
-              {(detail.anlasilan_ucret != null) && <DetailRow label="Anlaşılan Ücret" value={fmt(detail.anlasilan_ucret, detail.anlasilan_para_birimi)} color="#f87171" />}
-              {(detail.kalan_ucret != null) && <DetailRow label="Kalan Ücret" value={fmt(detail.kalan_ucret, detail.kalan_para_birimi)} color="#a78bfa" />}
-              {detail.not_kismi && <DetailRow label="Not" value={detail.not_kismi} multiline />}
-              {detail.yapilan_isler && <DetailRow label="Yapılan İşler" value={detail.yapilan_isler} multiline />}
-              {detail.sozlesme_url && (
-                <a href={detail.sozlesme_url} target="_blank" rel="noopener noreferrer"
-                  style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "var(--accent)", fontSize: 13, textDecoration: "none", padding: "8px 0" }}>
-                  <PdfIcon /> Sözleşmeyi Görüntüle
-                </a>
-              )}
+            <div style={{ display: "flex", minHeight: 0 }}>
+              {/* Sol: Bilgiler */}
+              <div className="modal__body" style={{ display: "flex", flexDirection: "column", gap: 12, flex: "0 0 auto", width: logsOpen ? 340 : "100%", transition: "width 0.25s ease" }}>
+                {detail.telefon && <DetailRow label="Telefon" value={detail.telefon} color="#fbbf24" />}
+                {detail.email && <DetailRow label="E-posta" value={detail.email} color="#a78bfa" />}
+                {detail.website_url && <DetailRow label="Web Sitesi" value={detail.website_url} color="#60a5fa" />}
+                {detail.google_maps_url && <DetailRow label="Google Maps" value="Haritada Gör" href={detail.google_maps_url} color="#34d399" />}
+                {detail.iletisim_tarihi && <DetailRow label="İletişim Tarihi" value={fmtDate(detail.iletisim_tarihi)} />}
+                {detail.sonuc && <DetailRow label="Sonuç" value={detail.sonuc} badge />}
+                {(detail.alinan_ucret != null) && <DetailRow label="Alınan Ücret" value={fmt(detail.alinan_ucret, detail.alinan_para_birimi)} color="#4ade80" />}
+                {(detail.anlasilan_ucret != null) && <DetailRow label="Anlaşılan Ücret" value={fmt(detail.anlasilan_ucret, detail.anlasilan_para_birimi)} color="#f87171" />}
+                {(detail.kalan_ucret != null) && <DetailRow label="Kalan Ücret" value={fmt(detail.kalan_ucret, detail.kalan_para_birimi)} color="#a78bfa" />}
+                {detail.not_kismi && <DetailRow label="Not" value={detail.not_kismi} multiline />}
+                {detail.yapilan_isler && <DetailRow label="Yapılan İşler" value={detail.yapilan_isler} multiline />}
+                {detail.sozlesme_url && (
+                  <a href={detail.sozlesme_url} target="_blank" rel="noopener noreferrer"
+                    style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "var(--accent)", fontSize: 13, textDecoration: "none", padding: "8px 0" }}>
+                    <PdfIcon /> Sözleşmeyi Görüntüle
+                  </a>
+                )}
+              </div>
 
-              {/* Activity log */}
+              {/* Sağ: Aktivite Geçmişi */}
               {logsOpen && (
-                <div style={{ marginTop: 4, borderTop: "1px solid var(--border)", paddingTop: 12 }}>
-                  <div style={{ fontSize: 12, color: "var(--text-mute)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>Aktivite Geçmişi</div>
+                <div style={{ flex: 1, borderLeft: "1px solid var(--border)", padding: "24px 20px", overflowY: "auto", maxHeight: "70vh", display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div style={{ fontSize: 11, color: "var(--text-mute)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Aktivite Geçmişi</div>
                   {logsLoading ? (
                     <div style={{ color: "var(--text-mute)", fontSize: 13 }}>Yükleniyor...</div>
                   ) : logs.length === 0 ? (
                     <div style={{ color: "var(--text-mute)", fontSize: 13 }}>Henüz kayıt yok.</div>
-                  ) : (
-                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                      {logs.map(log => (
-                        <div key={log.id} style={{ padding: "8px 10px", borderRadius: 7, background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", fontSize: 12 }}>
-                          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                            <span style={{ color: log.action === "olusturuldu" ? "#4ade80" : "#60a5fa", fontWeight: 600 }}>
-                              {log.action === "olusturuldu" ? "✦ Oluşturuldu" : "✎ Güncellendi"}
-                            </span>
-                            <span style={{ color: "var(--text-mute)", fontFamily: "var(--font-mono)" }}>
-                              {new Date(log.created_at).toLocaleString("tr-TR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
-                            </span>
-                          </div>
-                          <div style={{ color: "var(--text-dim)", marginBottom: 3 }}>
-                            <span style={{ color: "var(--text-mute)" }}>Kullanıcı: </span>{log.user_name}
-                          </div>
-                          {log.action === "guncellendi" && log.changes && (
-                            <div style={{ display: "flex", flexDirection: "column", gap: 3, marginTop: 4 }}>
-                              {Object.entries(log.changes as Record<string, { eski: any; yeni: any }>).map(([alan, { eski, yeni }]) => (
-                                <div key={alan} style={{ display: "flex", gap: 6, alignItems: "flex-start" }}>
-                                  <span style={{ color: "var(--text-mute)", minWidth: 90 }}>{alan}:</span>
-                                  <span style={{ color: "#f87171", textDecoration: "line-through" }}>{String(eski)}</span>
-                                  <span style={{ color: "var(--text-mute)" }}>→</span>
-                                  <span style={{ color: "#4ade80" }}>{String(yeni)}</span>
-                                </div>
-                              ))}
+                  ) : logs.map(log => (
+                    <div key={log.id} style={{ padding: "8px 10px", borderRadius: 7, background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", fontSize: 12 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                        <span style={{ color: log.action === "olusturuldu" ? "#4ade80" : "#60a5fa", fontWeight: 600 }}>
+                          {log.action === "olusturuldu" ? "✦ Oluşturuldu" : "✎ Güncellendi"}
+                        </span>
+                        <span style={{ color: "var(--text-mute)", fontFamily: "var(--font-mono)", fontSize: 11 }}>
+                          {new Date(log.created_at).toLocaleString("tr-TR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                        </span>
+                      </div>
+                      <div style={{ color: "var(--text-dim)", marginBottom: 3 }}>
+                        <span style={{ color: "var(--text-mute)" }}>Kullanıcı: </span>{log.user_name}
+                      </div>
+                      {log.action === "guncellendi" && log.changes && (
+                        <div style={{ display: "flex", flexDirection: "column", gap: 3, marginTop: 4 }}>
+                          {Object.entries(log.changes as Record<string, { eski: any; yeni: any }>).map(([alan, { eski, yeni }]) => (
+                            <div key={alan} style={{ display: "flex", gap: 6, alignItems: "flex-start", flexWrap: "wrap" }}>
+                              <span style={{ color: "var(--text-mute)", minWidth: 80 }}>{alan}:</span>
+                              <span style={{ color: "#f87171", textDecoration: "line-through" }}>{String(eski)}</span>
+                              <span style={{ color: "var(--text-mute)" }}>→</span>
+                              <span style={{ color: "#4ade80" }}>{String(yeni)}</span>
                             </div>
-                          )}
+                          ))}
                         </div>
-                      ))}
+                      )}
                     </div>
-                  )}
+                  ))}
                 </div>
               )}
             </div>
