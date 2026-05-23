@@ -357,11 +357,16 @@ function ContactModal({
   return (
     <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="modal">
+        <form onSubmit={handleSubmit}>
         <div className="modal__head">
           <h2 className="modal__title">{isNew ? "Yeni Kayıt Ekle" : "Kaydı Düzenle"}</h2>
-          <button className="modal__close" onClick={onClose}><CloseIcon /></button>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <button type="submit" className="btn btn--primary btn--sm" disabled={saving}>
+              {saving ? "Kaydediliyor..." : isNew ? "Kayıt Ekle" : "Değişiklikleri Kaydet"}
+            </button>
+            <button type="button" className="btn btn--ghost btn--sm" onClick={onClose}>İptal</button>
+          </div>
         </div>
-        <form onSubmit={handleSubmit}>
           <div className="modal__body" style={{ gap: 0, padding: 0 }}>
             {/* İki sütunlu ana düzen */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0 }}>
@@ -471,12 +476,6 @@ function ContactModal({
             </div>
           </div>
 
-          <div className="modal__foot">
-            <button type="button" className="btn btn--ghost btn--sm" onClick={onClose}>İptal</button>
-            <button type="submit" className="btn btn--primary btn--sm" disabled={saving}>
-              {saving ? "Kaydediliyor..." : isNew ? "Kayıt Ekle" : "Değişiklikleri Kaydet"}
-            </button>
-          </div>
         </form>
       </div>
     </div>
