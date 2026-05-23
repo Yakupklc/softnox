@@ -11,6 +11,7 @@ import { createClient } from "@/lib/supabase/client";
 import { StatCard } from "./StatCard";
 import { ContactDetailSheet } from "./ContactDetailSheet";
 import { ContactFormDialog } from "./ContactFormDialog";
+import { ContactHistoryDialog } from "./ContactHistoryDialog";
 import { WelcomeToast } from "@/components/admin/WelcomeToast";
 import type { Contact, ContactFormValues } from "./types";
 
@@ -33,6 +34,7 @@ export function CRMDashboard({ initialContacts, userName }: CRMDashboardProps) {
   const [formOpen, setFormOpen] = useState(false);
   const [formInitial, setFormInitial] = useState<Contact | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Contact | null>(null);
+  const [historyFor, setHistoryFor] = useState<Contact | null>(null);
 
   const stats = useMemo(() => {
     const by = (key: string) => contacts.filter(c => c.sonuc === key).length;
@@ -162,7 +164,13 @@ export function CRMDashboard({ initialContacts, userName }: CRMDashboardProps) {
         onClose={() => setDetailOpen(false)}
         onEdit={(c) => { setFormInitial(c); setFormOpen(true); setDetailOpen(false); }}
         onDelete={(c) => setConfirmDelete(c)}
-        onHistory={() => { /* History view lives in /admin/settings/audit */ }}
+        onHistory={(c) => { setHistoryFor(c); setDetailOpen(false); }}
+      />
+
+      <ContactHistoryDialog
+        contact={historyFor}
+        open={!!historyFor}
+        onClose={() => setHistoryFor(null)}
       />
 
       <ContactFormDialog
