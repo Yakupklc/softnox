@@ -14,7 +14,7 @@ interface AuditRow {
   contact_id: string;
   user_name: string | null;
   action: string;
-  changes: Record<string, { from: unknown; to: unknown; label?: string }> | null;
+  changes: Record<string, { eski: string; yeni: string }> | null;
   created_at: string;
   contacts: { sirket_adi: string } | null;
 }
@@ -25,8 +25,7 @@ function fmtDate(d: string) {
 }
 
 function fmtValue(v: unknown): string {
-  if (v == null) return "—";
-  if (typeof v === "object") return JSON.stringify(v);
+  if (v == null || v === "") return "—";
   return String(v);
 }
 
@@ -112,13 +111,13 @@ export function AuditPanel() {
               </div>
               {row.changes && Object.keys(row.changes).length > 0 && (
                 <div className="ui-audit-diff">
-                  {Object.entries(row.changes).map(([field, diff]) => (
-                    <div key={field} style={{ display: "contents" }}>
-                      <span className="ui-audit-diff__label">{diff.label ?? field}</span>
+                  {Object.entries(row.changes).map(([label, diff]) => (
+                    <div key={label} style={{ display: "contents" }}>
+                      <span className="ui-audit-diff__label">{label}</span>
                       <span>
-                        <span className="ui-audit-diff__from">{fmtValue(diff.from)}</span>
+                        <span className="ui-audit-diff__from">{fmtValue(diff.eski)}</span>
                         <span className="ui-audit-diff__arrow">→</span>
-                        <span className="ui-audit-diff__to">{fmtValue(diff.to)}</span>
+                        <span className="ui-audit-diff__to">{fmtValue(diff.yeni)}</span>
                       </span>
                     </div>
                   ))}
