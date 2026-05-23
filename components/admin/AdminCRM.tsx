@@ -223,8 +223,8 @@ const BADGE_COLORS: Record<string, string> = {
 const DetailRow = ({ label, value, color, href, badge, multiline }: {
   label: string; value: string; color?: string; href?: string; badge?: boolean; multiline?: boolean;
 }) => (
-  <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-    <span style={{ fontSize: 11, color: "var(--text-mute)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</span>
+  <div style={{ display: "flex", flexDirection: "column", gap: 3, padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+    <span style={{ fontSize: 10, color: "var(--text-mute)", textTransform: "uppercase", letterSpacing: "0.07em" }}>{label}</span>
     {href ? (
       <a href={href} target="_blank" rel="noopener noreferrer"
         style={{ color: color ?? "var(--text-base)", fontSize: 14, textDecoration: "none", fontWeight: 500 }}>{value}</a>
@@ -812,23 +812,26 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
       {detail && (
         <div className="modal-overlay" onClick={() => setDetail(null)}>
           <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: logsOpen ? 820 : 480, transition: "max-width 0.25s ease" }}>
-            <div className="modal__head">
+            {/* Drag handle — sadece mobilde görünür */}
+            <div style={{ display: "flex", justifyContent: "center", padding: "10px 0 4px" }}>
+              <div style={{ width: 36, height: 4, borderRadius: 99, background: "rgba(255,255,255,0.12)" }} />
+            </div>
+            <div className="modal__head" style={{ paddingTop: 8 }}>
               <div>
-                <div style={{ fontSize: 18, fontWeight: 700 }}>{detail.sirket_adi}</div>
-                <div style={{ fontSize: 13, color: "var(--text-mute)", marginTop: 2 }}>{detail.sahip_adi}</div>
+                <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: "-0.01em" }}>{detail.sirket_adi}</div>
+                {detail.sahip_adi && <div style={{ fontSize: 12, color: "var(--text-mute)", marginTop: 2 }}>{detail.sahip_adi}</div>}
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
                 <button onClick={() => { setLogsOpen(o => !o); if (!logsOpen) fetchLogs(detail.id); }}
-                  style={{ background: logsOpen ? "rgba(59,130,246,0.2)" : "rgba(59,130,246,0.1)", border: "1px solid #3b82f633", borderRadius: 6, padding: "4px 10px", cursor: "pointer", color: "#60a5fa", fontSize: 12, display: "flex", alignItems: "center", gap: 5 }}>
-                  <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                  Geçmiş
+                  style={{ background: logsOpen ? "rgba(59,130,246,0.2)" : "rgba(59,130,246,0.08)", border: "1px solid #3b82f633", borderRadius: 7, padding: "5px 11px", cursor: "pointer", color: "#60a5fa", fontSize: 12, display: "flex", alignItems: "center", gap: 5 }}>
+                  <HistoryIcon /> Geçmiş
                 </button>
                 <button onClick={() => { setDetail(null); setLogsOpen(false); setLogs([]); openEdit(detail); }}
-                  style={{ background: "rgba(96,165,250,0.1)", border: "1px solid #60a5fa33", borderRadius: 6, padding: "4px 10px", cursor: "pointer", color: "#60a5fa", fontSize: 12, display: "flex", alignItems: "center", gap: 5 }}>
+                  style={{ background: "rgba(96,165,250,0.08)", border: "1px solid #60a5fa33", borderRadius: 7, padding: "5px 11px", cursor: "pointer", color: "#60a5fa", fontSize: 12, display: "flex", alignItems: "center", gap: 5 }}>
                   <EditIcon /> Düzenle
                 </button>
                 <button onClick={() => handleDelete(detail.id)}
-                  style={{ background: "rgba(248,113,113,0.1)", border: "1px solid #f8717133", borderRadius: 6, padding: "4px 10px", cursor: "pointer", color: "#f87171", fontSize: 12, display: "flex", alignItems: "center", gap: 5 }}>
+                  style={{ background: "rgba(248,113,113,0.08)", border: "1px solid #f8717133", borderRadius: 7, padding: "5px 11px", cursor: "pointer", color: "#f87171", fontSize: 12, display: "flex", alignItems: "center", gap: 5 }}>
                   <TrashIcon /> Sil
                 </button>
                 <button className="modal__close" onClick={() => { setDetail(null); setLogsOpen(false); setLogs([]); }}>✕</button>
@@ -836,7 +839,7 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
             </div>
             <div style={{ display: "flex", minHeight: 0 }}>
               {/* Sol: Bilgiler */}
-              <div className="modal__body" style={{ display: "flex", flexDirection: "column", gap: 12, flex: "0 0 auto", width: logsOpen ? 340 : "100%", transition: "width 0.25s ease" }}>
+              <div className="modal__body" style={{ display: "flex", flexDirection: "column", gap: 0, flex: "0 0 auto", width: logsOpen ? 340 : "100%", transition: "width 0.25s ease", padding: "8px 24px 20px" }}>
                 {detail.telefon && <DetailRow label="Telefon" value={detail.telefon} color="#fbbf24" />}
                 {detail.email && <DetailRow label="E-posta" value={detail.email} color="#a78bfa" />}
                 {detail.website_url && <DetailRow label="Web Sitesi" value={detail.website_url} color="#60a5fa" />}
