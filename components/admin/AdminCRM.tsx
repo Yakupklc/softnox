@@ -616,29 +616,25 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
         <span style={{ fontSize: 12, color: "var(--text-mute)", fontFamily: "var(--font-mono)" }}>CRM</span>
 
         <div className="admin-topbar__right">
-          <div ref={userMenuRef} style={{ position: "relative" }}>
+          <div ref={userMenuRef} style={{ position: "relative", display: "flex", alignItems: "center", gap: 10 }}>
+            {/* Avatar — tıklanınca dropdown açılır */}
             <button
               onClick={() => setUserMenuOpen(o => !o)}
               style={{
-                display: "flex", alignItems: "center", gap: 10,
-                background: userMenuOpen ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.03)",
-                border: "1px solid var(--border)", borderRadius: 10,
-                padding: "6px 12px 6px 8px", cursor: "pointer",
-                transition: "all 0.15s",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                background: "none", border: "none", padding: 0, cursor: "pointer", flexShrink: 0,
               }}
-              onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.06)")}
-              onMouseLeave={e => (e.currentTarget.style.background = userMenuOpen ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.03)")}
             >
-              <div className="admin-topbar__avatar">{initials}</div>
-              <div className="admin-topbar__info">
-                <span className="admin-topbar__name">{profile.full_name}</span>
-                <span className="admin-topbar__role">{profile.role === "super_admin" ? "Süper Admin" : "Admin"}</span>
-              </div>
-              <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="var(--text-mute)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
-                style={{ marginLeft: 2, transition: "transform 0.2s", transform: userMenuOpen ? "rotate(180deg)" : "rotate(0deg)" }}>
-                <polyline points="6 9 12 15 18 9"/>
-              </svg>
+              <div className="admin-topbar__avatar" style={{
+                boxShadow: userMenuOpen ? "0 0 0 2px var(--accent)" : "none",
+                transition: "box-shadow 0.15s",
+              }}>{initials}</div>
             </button>
+            {/* İsim + rol — tıklanamaz, sadece gösterim */}
+            <div className="admin-topbar__info">
+              <span className="admin-topbar__name">{profile.full_name}</span>
+              <span className="admin-topbar__role">{profile.role === "super_admin" ? "Süper Admin" : "Admin"}</span>
+            </div>
 
             {userMenuOpen && (
               <div style={{
