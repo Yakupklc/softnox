@@ -1385,7 +1385,7 @@ button { font-family: inherit; }
 }
 .admin-topbar__right {
   margin-left: auto;
-  display: flex; align-items: center; gap: 14px;
+  display: flex; align-items: center; gap: 6px;
 }
 .admin-topbar__user {
   display: flex; align-items: center; gap: 10px;
