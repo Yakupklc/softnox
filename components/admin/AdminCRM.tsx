@@ -837,9 +837,9 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
                 <button className="modal__close" onClick={() => { setDetail(null); setLogsOpen(false); setLogs([]); }}>✕</button>
               </div>
             </div>
-            <div style={{ display: "flex", minHeight: 0 }}>
+            <div className="detail-card__layout">
               {/* Sol: Bilgiler */}
-              <div className="modal__body" style={{ display: "flex", flexDirection: "column", gap: 0, flex: "0 0 auto", width: logsOpen ? 340 : "100%", transition: "width 0.25s ease", padding: "8px 24px 20px" }}>
+              <div className="modal__body detail-card__info" style={{ display: "flex", flexDirection: "column", gap: 0, padding: "8px 24px 20px", width: logsOpen ? 340 : "100%", transition: "width 0.25s ease" }}>
                 {detail.telefon && <DetailRow label="Telefon" value={detail.telefon} color="#fbbf24" />}
                 {detail.email && <DetailRow label="E-posta" value={detail.email} color="#a78bfa" />}
                 {detail.website_url && <DetailRow label="Web Sitesi" value={detail.website_url} color="#60a5fa" />}
@@ -859,9 +859,9 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
                 )}
               </div>
 
-              {/* Sağ: Aktivite Geçmişi */}
+              {/* Sağ/Alt: Aktivite Geçmişi */}
               {logsOpen && (
-                <div style={{ flex: 1, borderLeft: "1px solid var(--border)", padding: "24px 20px", overflowY: "auto", maxHeight: "70vh", display: "flex", flexDirection: "column", gap: 8 }}>
+                <div className="detail-card__logs" style={{ padding: "20px", overflowY: "auto", display: "flex", flexDirection: "column", gap: 8 }}>
                   <div style={{ fontSize: 11, color: "var(--text-mute)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Aktivite Geçmişi</div>
                   {logsLoading ? (
                     <div style={{ color: "var(--text-mute)", fontSize: 13 }}>Yükleniyor...</div>
