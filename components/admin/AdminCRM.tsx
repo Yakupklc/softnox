@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -494,6 +494,18 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
   const [logsOpen, setLogsOpen] = useState(false);
   const [logsLoading, setLogsLoading] = useState(false);
   const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   const initials = profile.full_name.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase();
 
@@ -604,24 +616,59 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
         <span style={{ fontSize: 12, color: "var(--text-mute)", fontFamily: "var(--font-mono)" }}>CRM</span>
 
         <div className="admin-topbar__right">
-          <div className="admin-topbar__user">
-            <div className="admin-topbar__avatar">{initials}</div>
-            <div className="admin-topbar__info">
-              <span className="admin-topbar__name">{profile.full_name}</span>
-              <span className="admin-topbar__role">{profile.role === "super_admin" ? "Süper Admin" : "Admin"}</span>
-            </div>
-          </div>
-          {isSuperAdmin && (
+          <div ref={userMenuRef} style={{ position: "relative" }}>
             <button
-              onClick={() => router.push("/admin/settings")}
-              style={{ background: "none", border: "1px solid var(--border)", color: "var(--text-mute)", borderRadius: 6, padding: "4px 12px", fontSize: 12, cursor: "pointer" }}
+              onClick={() => setUserMenuOpen(o => !o)}
+              style={{
+                display: "flex", alignItems: "center", gap: 10,
+                background: userMenuOpen ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.03)",
+                border: "1px solid var(--border)", borderRadius: 10,
+                padding: "6px 12px 6px 8px", cursor: "pointer",
+                transition: "all 0.15s",
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.06)")}
+              onMouseLeave={e => (e.currentTarget.style.background = userMenuOpen ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.03)")}
             >
-              ⚙ Ayarlar
+              <div className="admin-topbar__avatar">{initials}</div>
+              <div className="admin-topbar__info">
+                <span className="admin-topbar__name">{profile.full_name}</span>
+                <span className="admin-topbar__role">{profile.role === "super_admin" ? "Süper Admin" : "Admin"}</span>
+              </div>
+              <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="var(--text-mute)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
+                style={{ marginLeft: 2, transition: "transform 0.2s", transform: userMenuOpen ? "rotate(180deg)" : "rotate(0deg)" }}>
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
             </button>
-          )}
-          <button className="admin-topbar__logout" onClick={handleLogout}>
-            <LogoutIcon /> Çıkış
-          </button>
+
+            {userMenuOpen && (
+              <div style={{
+                position: "absolute", top: "calc(100% + 8px)", right: 0,
+                background: "var(--bg-2)", border: "1px solid var(--border)",
+                borderRadius: 10, padding: "6px", minWidth: 180,
+                boxShadow: "0 12px 40px rgba(0,0,0,0.5)",
+                zIndex: 9999, display: "flex", flexDirection: "column", gap: 2,
+              }}>
+                {isSuperAdmin && (
+                  <button onClick={() => { setUserMenuOpen(false); router.push("/admin/settings"); }}
+                    style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 7, background: "none", border: "none", cursor: "pointer", color: "var(--text-dim)", fontSize: 13, textAlign: "left", width: "100%" }}
+                    onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")}
+                    onMouseLeave={e => (e.currentTarget.style.background = "none")}>
+                    <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                    Ayarlar
+                  </button>
+                )}
+                <div style={{ height: 1, background: "var(--border)", margin: "2px 0" }} />
+                <button onClick={() => { setUserMenuOpen(false); handleLogout(); }}
+                  style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 7, background: "none", border: "none", cursor: "pointer", color: "#f87171", fontSize: 13, textAlign: "left", width: "100%" }}
+                  onMouseEnter={e => (e.currentTarget.style.background = "rgba(248,113,113,0.08)")}
+                  onMouseLeave={e => (e.currentTarget.style.background = "none")}>
+                  <LogoutIcon /> Çıkış Yap
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
