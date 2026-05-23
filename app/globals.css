@@ -1380,7 +1380,7 @@ button { font-family: inherit; }
   backdrop-filter: blur(16px);
   position: sticky; top: 0; z-index: 40;
   display: flex; align-items: center;
-  padding: 0 28px;
+  padding: 0 clamp(16px, 5vw, 80px);
   gap: 20px;
 }
 .admin-topbar__right {
