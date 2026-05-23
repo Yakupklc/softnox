@@ -1,3 +1,6 @@
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+import { ReactNode } from "react";
+import { ToastProvider } from "@/components/ui";
+
+export default function AdminRootLayout({ children }: { children: ReactNode }) {
+  return <ToastProvider>{children}</ToastProvider>;
 }

@@ -1,0 +1,6 @@
+import { ReactNode } from "react";
+import { AuthShell } from "@/components/admin/AuthShell";
+
+export default function AuthLayout({ children }: { children: ReactNode }) {
+  return <AuthShell>{children}</AuthShell>;
+}
