@@ -49,7 +49,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       {...rest}
     >
       {loading ? <Spinner inverse={variant === "primary"} /> : leftIcon}
-      {!iconOnly && children}
+      {children}
       {!loading && rightIcon}
     </button>
   );
