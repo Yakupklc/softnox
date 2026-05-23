@@ -729,7 +729,7 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
                   <th>Alınan Ücret</th>
                   <th>Kalan Ücret</th>
                   <th>Sonuç</th>
-                  <th>İşlemler</th>
+                  <th style={{ textAlign: "right" }}>İşlemler</th>
                 </tr>
               </thead>
               <tbody>

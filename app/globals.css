@@ -1516,7 +1516,7 @@ button { font-family: inherit; }
 .crm-badge--Olumsuz { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
 .crm-badge--Devam { background: rgba(59,130,246,0.12); color: #60a5fa; border: 1px solid rgba(59,130,246,0.2); }
 
-.crm-actions { display: flex; gap: 6px; }
+.crm-actions { display: flex; gap: 6px; justify-content: flex-end; }
 .crm-icon-btn {
   width: 30px; height: 30px;
   display: inline-flex; align-items: center; justify-content: center;
