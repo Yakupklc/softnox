@@ -362,135 +362,111 @@ function ContactModal({
           <button className="modal__close" onClick={onClose}><CloseIcon /></button>
         </div>
         <form onSubmit={handleSubmit}>
-          <div className="modal__body">
-            <p className="modal__section-title">Firma Bilgileri</p>
-            <div className="modal__grid">
-              <FormField label="Şirket Adı">
-                <input value={form.sirket_adi} onChange={e => { set("sirket_adi", e.target.value); e.target.setCustomValidity(""); }} onInvalid={e => (e.target as HTMLInputElement).setCustomValidity("Şirket adı zorunludur")} required placeholder="Örn: ABC Teknoloji A.Ş." />
-              </FormField>
-              <FormField label="Sahip / Yetkili">
-                <input value={form.sahip_adi} onChange={e => set("sahip_adi", e.target.value)} placeholder="Ad Soyad" />
-              </FormField>
-              <FormField label="Telefon">
-                <input value={form.telefon} onChange={e => set("telefon", e.target.value)} placeholder="+90 5__ ___ __ __" />
-              </FormField>
-              <FormField label="E-posta">
-                <input type="email" value={form.email} onChange={e => set("email", e.target.value)} placeholder="ornek@firma.com" />
-              </FormField>
-              <FormField label="İletişim Tarihi">
-                <input type="date" value={form.iletisim_tarihi} onChange={e => set("iletisim_tarihi", e.target.value)} />
-              </FormField>
-              <FormField label="Web Sitesi">
-                <input value={form.website_url} onChange={e => set("website_url", e.target.value)} placeholder="https://firma.com" />
-              </FormField>
-              <FormField label="Google Maps Linki">
-                <input value={form.google_maps_url} onChange={e => set("google_maps_url", e.target.value)} placeholder="https://maps.google.com/..." />
-              </FormField>
-            </div>
+          <div className="modal__body" style={{ gap: 0, padding: 0 }}>
+            {/* İki sütunlu ana düzen */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0 }}>
 
-            <p className="modal__section-title">Finansal Bilgiler</p>
-            <div className="modal__grid">
-              <FormField label="Sonuç">
-                <select value={form.sonuc} onChange={e => set("sonuc", e.target.value)}>
-                  <option>Beklemede</option>
-                  <option>Olumlu</option>
-                  <option>Olumsuz</option>
-                  <option>Devam Ediyor</option>
-                </select>
-              </FormField>
-              {(form.sonuc === "Olumlu" || form.sonuc === "Devam Ediyor") && (
-                <div style={{ gridColumn: "1 / -1", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                  <label className="field">
-                    <span className="field__lbl" style={{ color: "#4ade80" }}>Alınan Ücret</span>
-                    <div style={{ display: "flex", gap: 6 }}>
-                      <input type="text" inputMode="numeric" value={form.alinan_ucret}
-                        onChange={e => {
-                          const raw = e.target.value.replace(/\./g, "").replace(/[^0-9,]/g, "");
-                          const parts = raw.split(",");
-                          parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-                          set("alinan_ucret", parts.join(","));
-                        }}
-                        placeholder="0" style={{ borderColor: "#4ade8033", color: "#4ade80" }} />
-                      <select value={form.alinan_para_birimi} onChange={e => set("alinan_para_birimi", e.target.value)}
-                        style={{ width: 72, flexShrink: 0, borderColor: "#4ade8033", color: "#4ade80", fontWeight: 600 }}>
-                        <option>₺</option><option>$</option><option>€</option><option>£</option>
-                      </select>
-                    </div>
-                  </label>
-                  <label className="field">
-                    <span className="field__lbl" style={{ color: "#f87171" }}>Anlaşılan Ücret</span>
-                    <div style={{ display: "flex", gap: 6 }}>
-                      <input type="text" inputMode="numeric" value={form.anlasilan_ucret}
-                        onChange={e => {
-                          const raw = e.target.value.replace(/\./g, "").replace(/[^0-9,]/g, "");
-                          const parts = raw.split(",");
-                          parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-                          set("anlasilan_ucret", parts.join(","));
-                        }}
-                        placeholder="0" style={{ borderColor: "#f8717133", color: "#f87171" }} />
-                      <select value={form.anlasilan_para_birimi} onChange={e => set("anlasilan_para_birimi", e.target.value)}
-                        style={{ width: 72, flexShrink: 0, borderColor: "#f8717133", color: "#f87171", fontWeight: 600 }}>
-                        <option>₺</option><option>$</option><option>€</option><option>£</option>
-                      </select>
-                    </div>
-                  </label>
-                  {/* Kalan ücret otomatik hesaplanır: anlaşılan - alınan */}
-                  {(() => {
-                    const alinan = form.alinan_ucret ? parseFloat(form.alinan_ucret.replace(/\./g, "").replace(",", ".")) : null;
-                    const anlasilan = form.anlasilan_ucret ? parseFloat(form.anlasilan_ucret.replace(/\./g, "").replace(",", ".")) : null;
-                    const kalan = (anlasilan != null && alinan != null) ? anlasilan - alinan : null;
-                    if (kalan == null) return null;
-                    return (
-                      <div style={{ gridColumn: "1 / -1", padding: "8px 12px", borderRadius: 8, background: "#a78bfa11", border: "1px solid #a78bfa33", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                        <span style={{ fontSize: 12, color: "#a78bfa", fontWeight: 500 }}>Kalan Ücret (otomatik)</span>
-                        <span style={{ fontSize: 15, fontWeight: 700, color: "#a78bfa", fontFamily: "var(--font-mono)" }}>
-                          {form.anlasilan_para_birimi}{kalan.toLocaleString("tr-TR")}
-                        </span>
+              {/* SOL: Firma Bilgileri */}
+              <div style={{ padding: "24px 28px", borderRight: "1px solid var(--border)", display: "flex", flexDirection: "column", gap: 14 }}>
+                <p className="modal__section-title" style={{ marginTop: 0 }}>Firma Bilgileri</p>
+                <FormField label="Şirket Adı">
+                  <input value={form.sirket_adi} onChange={e => { set("sirket_adi", e.target.value); e.target.setCustomValidity(""); }} onInvalid={e => (e.target as HTMLInputElement).setCustomValidity("Şirket adı zorunludur")} required placeholder="Örn: ABC Teknoloji A.Ş." />
+                </FormField>
+                <FormField label="Sahip / Yetkili">
+                  <input value={form.sahip_adi} onChange={e => set("sahip_adi", e.target.value)} placeholder="Ad Soyad" />
+                </FormField>
+                <FormField label="Telefon">
+                  <input value={form.telefon} onChange={e => set("telefon", e.target.value)} placeholder="+90 5__ ___ __ __" />
+                </FormField>
+                <FormField label="E-posta">
+                  <input type="email" value={form.email} onChange={e => set("email", e.target.value)} placeholder="ornek@firma.com" />
+                </FormField>
+                <FormField label="İletişim Tarihi">
+                  <input type="date" value={form.iletisim_tarihi} onChange={e => set("iletisim_tarihi", e.target.value)} />
+                </FormField>
+                <FormField label="Web Sitesi">
+                  <input value={form.website_url} onChange={e => set("website_url", e.target.value)} placeholder="https://firma.com" />
+                </FormField>
+                <FormField label="Google Maps Linki">
+                  <input value={form.google_maps_url} onChange={e => set("google_maps_url", e.target.value)} placeholder="https://maps.google.com/..." />
+                </FormField>
+              </div>
+
+              {/* SAĞ: Finansal + Notlar */}
+              <div style={{ padding: "24px 28px", display: "flex", flexDirection: "column", gap: 14 }}>
+                <p className="modal__section-title" style={{ marginTop: 0 }}>Finansal & Notlar</p>
+                <FormField label="Sonuç">
+                  <select value={form.sonuc} onChange={e => set("sonuc", e.target.value)}>
+                    <option>Beklemede</option><option>Olumlu</option><option>Olumsuz</option><option>Devam Ediyor</option>
+                  </select>
+                </FormField>
+
+                {(form.sonuc === "Olumlu" || form.sonuc === "Devam Ediyor") && (
+                  <>
+                    <label className="field">
+                      <span className="field__lbl" style={{ color: "#4ade80" }}>Alınan Ücret</span>
+                      <div style={{ display: "flex", gap: 6 }}>
+                        <input type="text" inputMode="numeric" value={form.alinan_ucret}
+                          onChange={e => { const raw = e.target.value.replace(/\./g, "").replace(/[^0-9,]/g, ""); const parts = raw.split(","); parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, "."); set("alinan_ucret", parts.join(",")); }}
+                          placeholder="0" style={{ borderColor: "#4ade8033", color: "#4ade80" }} />
+                        <select value={form.alinan_para_birimi} onChange={e => set("alinan_para_birimi", e.target.value)}
+                          style={{ width: 64, flexShrink: 0, borderColor: "#4ade8033", color: "#4ade80", fontWeight: 600 }}>
+                          <option>₺</option><option>$</option><option>€</option><option>£</option>
+                        </select>
                       </div>
-                    );
-                  })()}
-                </div>
-              )}
+                    </label>
+                    <label className="field">
+                      <span className="field__lbl" style={{ color: "#f87171" }}>Anlaşılan Ücret</span>
+                      <div style={{ display: "flex", gap: 6 }}>
+                        <input type="text" inputMode="numeric" value={form.anlasilan_ucret}
+                          onChange={e => { const raw = e.target.value.replace(/\./g, "").replace(/[^0-9,]/g, ""); const parts = raw.split(","); parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, "."); set("anlasilan_ucret", parts.join(",")); }}
+                          placeholder="0" style={{ borderColor: "#f8717133", color: "#f87171" }} />
+                        <select value={form.anlasilan_para_birimi} onChange={e => set("anlasilan_para_birimi", e.target.value)}
+                          style={{ width: 64, flexShrink: 0, borderColor: "#f8717133", color: "#f87171", fontWeight: 600 }}>
+                          <option>₺</option><option>$</option><option>€</option><option>£</option>
+                        </select>
+                      </div>
+                    </label>
+                    {(() => {
+                      const alinan = form.alinan_ucret ? parseFloat(form.alinan_ucret.replace(/\./g, "").replace(",", ".")) : null;
+                      const anlasilan = form.anlasilan_ucret ? parseFloat(form.anlasilan_ucret.replace(/\./g, "").replace(",", ".")) : null;
+                      const kalan = (anlasilan != null && alinan != null) ? anlasilan - alinan : null;
+                      if (kalan == null) return null;
+                      return (
+                        <div style={{ padding: "8px 12px", borderRadius: 8, background: "#a78bfa11", border: "1px solid #a78bfa33", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                          <span style={{ fontSize: 12, color: "#a78bfa", fontWeight: 500 }}>Kalan Ücret</span>
+                          <span style={{ fontSize: 15, fontWeight: 700, color: "#a78bfa", fontFamily: "var(--font-mono)" }}>{form.anlasilan_para_birimi}{kalan.toLocaleString("tr-TR")}</span>
+                        </div>
+                      );
+                    })()}
+                  </>
+                )}
+
+                <FormField label="Not">
+                  <textarea rows={3} value={form.not_kismi} onChange={e => set("not_kismi", e.target.value)} placeholder="Genel notlar..." />
+                </FormField>
+                <FormField label="Yapılan İşler">
+                  <textarea rows={3} value={form.yapilan_isler} onChange={e => set("yapilan_isler", e.target.value)} placeholder="Gerçekleştirilen işler, görüşmeler..." />
+                </FormField>
+
+                {(form.sonuc === "Olumlu" || form.sonuc === "Devam Ediyor") && (
+                  <div className="file-field">
+                    <span className="file-field__label">Sözleşme PDF</span>
+                    <label style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}>
+                      <span style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "rgba(59,130,246,0.1)", color: "var(--accent)", fontSize: 13, fontWeight: 500, whiteSpace: "nowrap", flexShrink: 0 }}>Dosya Seç</span>
+                      <span style={{ color: file ? "var(--text-base)" : "var(--text-mute)", fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{file ? file.name : "Dosya seçilmedi"}</span>
+                      <input type="file" accept=".pdf,application/pdf" style={{ display: "none" }} onChange={e => setFile(e.target.files?.[0] ?? null)} />
+                    </label>
+                    {contact?.sozlesme_url && !file && (
+                      <div className="file-field__current">
+                        <PdfIcon /> Mevcut sözleşme —{" "}
+                        <a href={contact.sozlesme_url} target="_blank" rel="noopener noreferrer" style={{ color: "var(--accent-2)" }}>Görüntüle</a>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
-
-            <p className="modal__section-title">Notlar & İşler</p>
-            <FormField label="Not">
-              <textarea rows={3} value={form.not_kismi} onChange={e => set("not_kismi", e.target.value)} placeholder="Genel notlar..." />
-            </FormField>
-            <FormField label="Yapılan İşler">
-              <textarea rows={3} value={form.yapilan_isler} onChange={e => set("yapilan_isler", e.target.value)} placeholder="Gerçekleştirilen işler, görüşmeler..." />
-            </FormField>
-
-            {(form.sonuc === "Olumlu" || form.sonuc === "Devam Ediyor") && (
-              <>
-                <p className="modal__section-title">Sözleşme</p>
-                <div className="file-field">
-                  <span className="file-field__label">Sözleşme PDF</span>
-                  <label style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}>
-                    <span style={{
-                      padding: "8px 16px", borderRadius: 8, border: "1px solid var(--border)",
-                      background: "rgba(59,130,246,0.1)", color: "var(--accent)", fontSize: 13, fontWeight: 500,
-                      whiteSpace: "nowrap", flexShrink: 0,
-                    }}>
-                      Dosya Seç
-                    </span>
-                    <span style={{ color: file ? "var(--text-base)" : "var(--text-mute)", fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {file ? file.name : "Dosya seçilmedi"}
-                    </span>
-                    <input type="file" accept=".pdf,application/pdf" style={{ display: "none" }}
-                      onChange={e => setFile(e.target.files?.[0] ?? null)} />
-                  </label>
-                  {contact?.sozlesme_url && !file && (
-                    <div className="file-field__current">
-                      <PdfIcon /> Mevcut sözleşme yüklü —{" "}
-                      <a href={contact.sozlesme_url} target="_blank" rel="noopener noreferrer" style={{ color: "var(--accent-2)" }}>
-                        Görüntüle
-                      </a>
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
           </div>
 
           <div className="modal__foot">
