@@ -3,6 +3,44 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
+/* ===== Confirm Dialog ===== */
+function ConfirmDialog({ message, onConfirm, onCancel }: { message: string; onConfirm: () => void; onCancel: () => void }) {
+  return (
+    <div className="modal-overlay" style={{ zIndex: 9999 }} onClick={onCancel}>
+      <div onClick={e => e.stopPropagation()} style={{
+        background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: 14,
+        padding: "28px 28px 22px", maxWidth: 380, width: "90%", boxShadow: "0 24px 64px #000a",
+        display: "flex", flexDirection: "column", gap: 20,
+      }}>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
+          <div style={{
+            width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+            background: "rgba(248,113,113,0.12)", border: "1px solid #f8717133",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 6h18"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+              <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+            </svg>
+          </div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 6 }}>Kaydı Sil</div>
+            <div style={{ color: "var(--text-dim)", fontSize: 13, lineHeight: 1.6 }}>{message}</div>
+          </div>
+        </div>
+        <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+          <button onClick={onCancel} className="btn btn--ghost btn--sm">İptal</button>
+          <button onClick={onConfirm} style={{
+            padding: "6px 16px", borderRadius: 7, border: "1px solid #f8717155",
+            background: "rgba(248,113,113,0.12)", color: "#f87171",
+            fontSize: 13, fontWeight: 600, cursor: "pointer",
+          }}>Sil</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const QUICK_LINKS = {
   google: "https://maps.google.com/?q=Softnox",
   website: "https://softnox.com.tr",
@@ -437,6 +475,7 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
   const [logs, setLogs] = useState<any[]>([]);
   const [logsOpen, setLogsOpen] = useState(false);
   const [logsLoading, setLogsLoading] = useState(false);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
 
   const initials = profile.full_name.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase();
 
@@ -519,10 +558,16 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
     closeModal();
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Bu kaydı silmek istediğinize emin misiniz?")) return;
-    const { error } = await supabase.from("contacts").delete().eq("id", id);
-    if (!error) setContacts(prev => prev.filter(c => c.id !== id));
+  const handleDelete = (id: string) => setConfirmId(id);
+
+  const confirmDelete = async () => {
+    if (!confirmId) return;
+    const { error } = await supabase.from("contacts").delete().eq("id", confirmId);
+    if (!error) {
+      setContacts(prev => prev.filter(c => c.id !== confirmId));
+      if (detail?.id === confirmId) { setDetail(null); setLogsOpen(false); setLogs([]); }
+    }
+    setConfirmId(null);
   };
 
   const badgeClass = (sonuc?: string) => {
@@ -727,7 +772,7 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
                   style={{ background: "rgba(96,165,250,0.1)", border: "1px solid #60a5fa33", borderRadius: 6, padding: "4px 10px", cursor: "pointer", color: "#60a5fa", fontSize: 12, display: "flex", alignItems: "center", gap: 5 }}>
                   <EditIcon /> Düzenle
                 </button>
-                <button onClick={() => { handleDelete(detail.id); setDetail(null); setLogsOpen(false); setLogs([]); }}
+                <button onClick={() => handleDelete(detail.id)}
                   style={{ background: "rgba(248,113,113,0.1)", border: "1px solid #f8717133", borderRadius: 6, padding: "4px 10px", cursor: "pointer", color: "#f87171", fontSize: 12, display: "flex", alignItems: "center", gap: 5 }}>
                   <TrashIcon /> Sil
                 </button>
@@ -805,6 +850,15 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
           contact={modal.contact}
           onClose={closeModal}
           onSave={handleSave}
+        />
+      )}
+
+      {/* Confirm Delete Dialog */}
+      {confirmId && (
+        <ConfirmDialog
+          message="Bu kaydı kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz."
+          onConfirm={confirmDelete}
+          onCancel={() => setConfirmId(null)}
         />
       )}
     </div>
