@@ -238,10 +238,17 @@ const DetailRow = ({ label, value, color, href, badge, multiline }: {
   </div>
 );
 
+/* PDF — kırmızı köşeli dosya */
 const PdfIcon = () => (
   <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" />
-    <line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" />
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+    <path d="M9 13h1.5a1 1 0 0 1 0 2H9v-4h1.5a1 1 0 0 1 0 2"/><path d="M14 13v4"/><path d="M17 13h-2v4"/>
+  </svg>
+);
+/* Saat — aktivite geçmişi */
+const HistoryIcon = () => (
+  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/>
   </svg>
 );
 const PlusIcon = () => (
@@ -259,6 +266,41 @@ const LogoutIcon = () => (
     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
   </svg>
 );
+
+/* ===== Tooltip Button ===== */
+function TipBtn({ tip, color, danger, onClick, children, href }: {
+  tip: string; color?: string; danger?: boolean; onClick?: (e: React.MouseEvent) => void;
+  children: React.ReactNode; href?: string;
+}) {
+  const [show, setShow] = useState(false);
+  const base: React.CSSProperties = {
+    position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center",
+    width: 30, height: 30, borderRadius: 7, border: "1px solid var(--border)",
+    background: "rgba(255,255,255,0.03)", cursor: "pointer",
+    color: danger ? "#f87171" : (color ?? "var(--text-dim)"),
+    transition: "all 0.15s", flexShrink: 0,
+  };
+  const tooltip: React.CSSProperties = {
+    position: "absolute", bottom: "calc(100% + 6px)", left: "50%", transform: "translateX(-50%)",
+    background: "#1e2330", border: "1px solid var(--border)", borderRadius: 6,
+    padding: "4px 8px", fontSize: 11, whiteSpace: "nowrap", color: "var(--text-base)",
+    pointerEvents: "none", zIndex: 9999,
+    opacity: show ? 1 : 0, transition: "opacity 0.1s",
+  };
+  const inner = (
+    <button
+      style={base}
+      onClick={onClick}
+      onMouseEnter={e => { setShow(true); (e.currentTarget as HTMLElement).style.background = danger ? "rgba(248,113,113,0.12)" : "rgba(255,255,255,0.07)"; (e.currentTarget as HTMLElement).style.borderColor = danger ? "#f8717155" : (color ? color + "55" : "var(--border)"); }}
+      onMouseLeave={e => { setShow(false); (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.03)"; (e.currentTarget as HTMLElement).style.borderColor = "var(--border)"; }}
+    >
+      {children}
+      <span style={tooltip}>{tip}</span>
+    </button>
+  );
+  if (href) return <a href={href} target="_blank" rel="noopener noreferrer" onClick={onClick} style={{ display: "inline-flex" }}>{inner}</a>;
+  return inner;
+}
 
 /* ===== Field ===== */
 const FormField = ({ label, children }: { label: string; children: React.ReactNode }) => (
@@ -727,22 +769,19 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
                     <td>
                       <div className="crm-actions">
                         {c.sozlesme_url && (
-                          <a href={c.sozlesme_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>
-                            <button className="crm-icon-btn crm-icon-btn--pdf" title="Sözleşmeyi görüntüle">
-                              <PdfIcon />
-                            </button>
-                          </a>
+                          <TipBtn tip="Sözleşmeyi Gör" color="#f87171" href={c.sozlesme_url} onClick={e => e.stopPropagation()}>
+                            <PdfIcon />
+                          </TipBtn>
                         )}
-                        <button className="crm-icon-btn" title="Geçmiş" onClick={e => { e.stopPropagation(); setDetail(c); setLogs([]); setLogsOpen(false); setTimeout(() => fetchLogs(c.id), 50); }}
-                          style={{ color: "#60a5fa" }}>
-                          <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                        </button>
-                        <button className="crm-icon-btn" title="Düzenle" onClick={e => { e.stopPropagation(); openEdit(c); }}>
+                        <TipBtn tip="Aktivite Geçmişi" color="#60a5fa" onClick={e => { e.stopPropagation(); setDetail(c); setLogs([]); setLogsOpen(false); setTimeout(() => fetchLogs(c.id), 50); }}>
+                          <HistoryIcon />
+                        </TipBtn>
+                        <TipBtn tip="Düzenle" color="#fbbf24" onClick={e => { e.stopPropagation(); openEdit(c); }}>
                           <EditIcon />
-                        </button>
-                        <button className="crm-icon-btn crm-icon-btn--danger" title="Sil" onClick={e => { e.stopPropagation(); handleDelete(c.id); }}>
+                        </TipBtn>
+                        <TipBtn tip="Kaydı Sil" danger onClick={e => { e.stopPropagation(); handleDelete(c.id); }}>
                           <TrashIcon />
-                        </button>
+                        </TipBtn>
                       </div>
                     </td>
                   </tr>
