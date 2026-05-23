@@ -1380,8 +1380,13 @@ button { font-family: inherit; }
   backdrop-filter: blur(16px);
   position: sticky; top: 0; z-index: 40;
   display: flex; align-items: center;
-  padding: 0 clamp(16px, 5vw, 80px);
-  gap: 20px;
+  padding: 0;
+  gap: 0;
+}
+.admin-topbar__inner {
+  display: flex; align-items: center; gap: 20px;
+  width: 100%; max-width: 1400px; margin: 0 auto;
+  padding: 0 28px;
 }
 .admin-topbar__right {
   margin-left: auto;
@@ -1653,9 +1658,12 @@ button { font-family: inherit; }
 @media (max-width: 768px) {
   /* Topbar */
   .admin-topbar {
+    padding: 0;
+    height: 56px;
+  }
+  .admin-topbar__inner {
     padding: 0 16px;
     gap: 10px;
-    height: 56px;
   }
   .admin-topbar .logo-text { display: none; }
   .admin-topbar__info { display: none; }

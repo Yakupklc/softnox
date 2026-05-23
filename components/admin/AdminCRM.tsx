@@ -613,6 +613,7 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
     <div className="admin-shell">
       {/* Topbar */}
       <div className="admin-topbar">
+        <div className="admin-topbar__inner">
         <Logo />
         <div style={{ height: 24, width: 1, background: "var(--border)", margin: "0 4px" }} />
         <span style={{ fontSize: 12, color: "var(--text-mute)", fontFamily: "var(--font-mono)" }}>CRM</span>
@@ -662,6 +663,7 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
             )}
           </div>
         </div>
+        </div>{/* admin-topbar__inner */}
       </div>
 
       {/* Main */}
