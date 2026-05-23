@@ -403,30 +403,32 @@ function ContactModal({
 
                 {(form.sonuc === "Olumlu" || form.sonuc === "Devam Ediyor") && (
                   <>
-                    <label className="field">
-                      <span className="field__lbl" style={{ color: "#4ade80" }}>Alınan Ücret</span>
-                      <div style={{ display: "flex", gap: 6 }}>
-                        <input type="text" inputMode="numeric" value={form.alinan_ucret}
-                          onChange={e => { const raw = e.target.value.replace(/\./g, "").replace(/[^0-9,]/g, ""); const parts = raw.split(","); parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, "."); set("alinan_ucret", parts.join(",")); }}
-                          placeholder="0" style={{ borderColor: "#4ade8033", color: "#4ade80" }} />
-                        <select value={form.alinan_para_birimi} onChange={e => set("alinan_para_birimi", e.target.value)}
-                          style={{ width: 64, flexShrink: 0, borderColor: "#4ade8033", color: "#4ade80", fontWeight: 600 }}>
-                          <option>₺</option><option>$</option><option>€</option><option>£</option>
-                        </select>
-                      </div>
-                    </label>
-                    <label className="field">
-                      <span className="field__lbl" style={{ color: "#f87171" }}>Anlaşılan Ücret</span>
-                      <div style={{ display: "flex", gap: 6 }}>
-                        <input type="text" inputMode="numeric" value={form.anlasilan_ucret}
-                          onChange={e => { const raw = e.target.value.replace(/\./g, "").replace(/[^0-9,]/g, ""); const parts = raw.split(","); parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, "."); set("anlasilan_ucret", parts.join(",")); }}
-                          placeholder="0" style={{ borderColor: "#f8717133", color: "#f87171" }} />
-                        <select value={form.anlasilan_para_birimi} onChange={e => set("anlasilan_para_birimi", e.target.value)}
-                          style={{ width: 64, flexShrink: 0, borderColor: "#f8717133", color: "#f87171", fontWeight: 600 }}>
-                          <option>₺</option><option>$</option><option>€</option><option>£</option>
-                        </select>
-                      </div>
-                    </label>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                      <label className="field">
+                        <span className="field__lbl" style={{ color: "#4ade80" }}>Alınan Ücret</span>
+                        <div style={{ display: "flex", gap: 6 }}>
+                          <input type="text" inputMode="numeric" value={form.alinan_ucret}
+                            onChange={e => { const raw = e.target.value.replace(/\./g, "").replace(/[^0-9,]/g, ""); const parts = raw.split(","); parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, "."); set("alinan_ucret", parts.join(",")); }}
+                            placeholder="0" style={{ borderColor: "#4ade8033", color: "#4ade80" }} />
+                          <select value={form.alinan_para_birimi} onChange={e => set("alinan_para_birimi", e.target.value)}
+                            style={{ width: 64, flexShrink: 0, borderColor: "#4ade8033", color: "#4ade80", fontWeight: 600 }}>
+                            <option>₺</option><option>$</option><option>€</option><option>£</option>
+                          </select>
+                        </div>
+                      </label>
+                      <label className="field">
+                        <span className="field__lbl" style={{ color: "#f87171" }}>Anlaşılan Ücret</span>
+                        <div style={{ display: "flex", gap: 6 }}>
+                          <input type="text" inputMode="numeric" value={form.anlasilan_ucret}
+                            onChange={e => { const raw = e.target.value.replace(/\./g, "").replace(/[^0-9,]/g, ""); const parts = raw.split(","); parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, "."); set("anlasilan_ucret", parts.join(",")); }}
+                            placeholder="0" style={{ borderColor: "#f8717133", color: "#f87171" }} />
+                          <select value={form.anlasilan_para_birimi} onChange={e => set("anlasilan_para_birimi", e.target.value)}
+                            style={{ width: 64, flexShrink: 0, borderColor: "#f8717133", color: "#f87171", fontWeight: 600 }}>
+                            <option>₺</option><option>$</option><option>€</option><option>£</option>
+                          </select>
+                        </div>
+                      </label>
+                    </div>
                     {(() => {
                       const alinan = form.alinan_ucret ? parseFloat(form.alinan_ucret.replace(/\./g, "").replace(",", ".")) : null;
                       const anlasilan = form.anlasilan_ucret ? parseFloat(form.anlasilan_ucret.replace(/\./g, "").replace(",", ".")) : null;
