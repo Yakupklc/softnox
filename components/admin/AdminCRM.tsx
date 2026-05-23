@@ -617,24 +617,18 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
 
         <div className="admin-topbar__right">
           <div ref={userMenuRef} style={{ position: "relative", display: "flex", alignItems: "center", gap: 10 }}>
-            {/* Avatar — tıklanınca dropdown açılır */}
-            <button
-              onClick={() => setUserMenuOpen(o => !o)}
-              style={{
-                display: "flex", alignItems: "center", justifyContent: "center",
-                background: "none", border: "none", padding: 0, cursor: "pointer", flexShrink: 0,
-              }}
-            >
-              <div className="admin-topbar__avatar" style={{
-                boxShadow: userMenuOpen ? "0 0 0 2px var(--accent)" : "none",
-                transition: "box-shadow 0.15s",
-              }}>{initials}</div>
-            </button>
-            {/* İsim + rol — tıklanamaz, sadece gösterim */}
-            <div className="admin-topbar__info">
+            {/* İsim + rol solda */}
+            <div className="admin-topbar__info" style={{ textAlign: "right" }}>
               <span className="admin-topbar__name">{profile.full_name}</span>
               <span className="admin-topbar__role">{profile.role === "super_admin" ? "Süper Admin" : "Admin"}</span>
             </div>
+            {/* Avatar sağda — tıklanınca dropdown açılır */}
+            <button
+              onClick={() => setUserMenuOpen(o => !o)}
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", padding: 0, cursor: "pointer", flexShrink: 0 }}
+            >
+              <div className="admin-topbar__avatar" style={{ boxShadow: userMenuOpen ? "0 0 0 2px var(--accent)" : "none", transition: "box-shadow 0.15s" }}>{initials}</div>
+            </button>
 
             {userMenuOpen && (
               <div style={{
