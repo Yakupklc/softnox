@@ -629,7 +629,7 @@ export default function AdminCRM({ profile, initialContacts }: { profile: Profil
       <main className="admin-main">
         <div className="admin-page-head">
           <div>
-            <h1 className="admin-page-title">Potansiyel Müşteriler</h1>
+            <h1 className="admin-page-title">Müşteri Listesi</h1>
             <p className="admin-page-sub">İletişime geçilen kişi ve firmaların takibi</p>
           </div>
           <button className="btn btn--primary btn--sm" onClick={openNew}>
